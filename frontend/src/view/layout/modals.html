@@ -28,9 +28,23 @@
                             <label class="form-label" for="product-stock">Stock</label>
                             <input class="form-control" id="product-stock" type="number" min="0" step="1" required>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="product-image">Imagen</label>
-                            <input class="form-control" id="product-image" type="text" placeholder="assets/img/producto.png">
+                        <div class="col-12">
+                            <label class="form-label" for="product-image-file">Imagen del producto</label>
+                            <div class="image-upload-box">
+                                <div class="image-preview">
+                                    <img id="product-image-preview" src="assets/img/descarga.png" alt="Vista previa">
+                                </div>
+                                <div class="image-upload-content">
+                                    <input type="hidden" id="product-image">
+                                    <input class="form-control" id="product-image-file" type="file" accept="image/*">
+                                    <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
+                                        <label class="btn btn-outline-secondary btn-sm mb-0" for="product-image-file">
+                                            <i class="bi bi-image me-1"></i>Cambiar foto
+                                        </label>
+                                        <span class="image-upload-status" id="product-image-status">Usa PNG, JPG, JPEG o WEBP.</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label" for="product-description">Descripcion</label>
@@ -41,6 +55,38 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Guardar producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <p class="eyebrow mb-1">Administrador</p>
+                    <h5 class="modal-title" id="categoryModalLabel">Categoria</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form id="category-form">
+                <div class="modal-body">
+                    <input type="hidden" id="category-id">
+                    <div class="mb-3">
+                        <label class="form-label" for="category-name">Nombre</label>
+                        <input class="form-control" id="category-name" type="text" maxlength="80" required>
+                    </div>
+                    <div>
+                        <label class="form-label" for="category-description">Descripcion</label>
+                        <textarea class="form-control" id="category-description" rows="3" maxlength="250"></textarea>
+                    </div>
+                    <div class="alert alert-warning mt-3 mb-0 d-none" id="category-alert"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Guardar categoria</button>
                 </div>
             </form>
         </div>

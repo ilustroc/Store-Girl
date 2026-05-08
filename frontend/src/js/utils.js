@@ -46,7 +46,18 @@ const StoreUtils = (() => {
     }
 
     function productImage(product) {
-        return product?.image || "assets/img/descarga.png";
+        const image = product?.image?.trim();
+        if (!image) return fallbackImage();
+        if (/^https?:\/\//i.test(image) || image.startsWith("assets/")) return image;
+        return fallbackImage();
+    }
+
+    function fallbackImage() {
+        return "assets/img/descarga.png";
+    }
+
+    function imageFallbackAttr() {
+        return `onerror="this.onerror=null;this.src='${fallbackImage()}'"`;
     }
 
     function orderStatusClass(status) {
@@ -57,5 +68,5 @@ const StoreUtils = (() => {
         }[status] || "secondary";
     }
 
-    return { money, date, escapeHtml, toast, categoryName, productImage, orderStatusClass };
+    return { money, date, escapeHtml, toast, categoryName, productImage, imageFallbackAttr, orderStatusClass };
 })();

@@ -79,4 +79,12 @@
     .cart-line > strong {
         grid-column: 2;
     }
+
+    .image-upload-box {
+        grid-template-columns: 1fr;
+    }
+
+    .image-preview {
+        max-width: 180px;
+    }
 }

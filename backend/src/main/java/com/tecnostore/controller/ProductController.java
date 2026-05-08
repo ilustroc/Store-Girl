@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
 
@@ -42,19 +42,29 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product create(@RequestHeader(value = "X-User-Role", required = false) String role, @Valid @RequestBody ProductRequest request) {
+    public Product create(
+            @RequestHeader(value = "X-User-Role", required = false) String role,
+            @Valid @RequestBody ProductRequest request
+    ) {
         requireAdmin(role);
         return productService.create(request);
     }
 
     @PutMapping("/{id}")
-    public Product update(@RequestHeader(value = "X-User-Role", required = false) String role, @PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+    public Product update(
+            @RequestHeader(value = "X-User-Role", required = false) String role,
+            @PathVariable Long id,
+            @Valid @RequestBody ProductRequest request
+    ) {
         requireAdmin(role);
         return productService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@RequestHeader(value = "X-User-Role", required = false) String role, @PathVariable Long id) {
+    public void delete(
+            @RequestHeader(value = "X-User-Role", required = false) String role,
+            @PathVariable Long id
+    ) {
         requireAdmin(role);
         productService.delete(id);
     }

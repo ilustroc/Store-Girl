@@ -28,14 +28,39 @@ const Api = (() => {
         return data;
     }
 
+    async function upload(path, file) {
+        const session = currentSession();
+        const headers = {};
+        if (session?.role) headers["X-User-Role"] = session.role;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch(`${baseUrl}${path}`, {
+            method: "POST",
+            headers,
+            body: formData
+        });
+
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
+        if (!response.ok) {
+            throw new Error(data?.message || data?.error || "No se pudo completar la solicitud");
+        }
+        return data;
+    }
+
     return {
         getCategories: () => request("/categories"),
+        createCategory: category => request("/categories", { method: "POST", body: category }),
+        updateCategory: (id, category) => request(`/categories/${id}`, { method: "PUT", body: category }),
         getProducts: () => request("/products"),
         getProduct: id => request(`/products/${id}`),
         getProductsByCategory: categoryId => request(`/products/category/${categoryId}`),
         createProduct: product => request("/products", { method: "POST", body: product }),
         updateProduct: (id, product) => request(`/products/${id}`, { method: "PUT", body: product }),
         deleteProduct: id => request(`/products/${id}`, { method: "DELETE" }),
+        uploadProductImage: file => upload("/uploads/product-image", file),
         login: credentials => request("/auth/login", { method: "POST", body: credentials }),
         register: user => request("/auth/register", { method: "POST", body: user }),
         createOrder: order => request("/orders", { method: "POST", body: order }),

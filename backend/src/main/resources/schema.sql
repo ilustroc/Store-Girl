@@ -1,10 +1,4 @@
-DROP TABLE IF EXISTS order_items;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS products;
-DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS users;
-
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(120) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
@@ -15,13 +9,13 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(80) NOT NULL UNIQUE,
     description VARCHAR(250)
 );
 
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(140) NOT NULL,
     description VARCHAR(500) NOT NULL,
@@ -34,7 +28,7 @@ CREATE TABLE products (
     CONSTRAINT fk_products_categories FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     total DECIMAL(12, 2) NOT NULL,
@@ -43,7 +37,7 @@ CREATE TABLE orders (
     CONSTRAINT fk_orders_users FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,

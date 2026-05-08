@@ -52,6 +52,12 @@ http://localhost:5501
 
 El backend debe estar activo en `http://localhost:8080/api`.
 
+La URL del API esta en `src/js/api.js`:
+
+```javascript
+const baseUrl = localStorage.getItem("tecnostore.apiUrl") || "http://localhost:8080/api";
+```
+
 ## Rutas
 
 ```text
@@ -66,3 +72,20 @@ El backend debe estar activo en `http://localhost:8080/api`.
 #/admin
 #/admin/productos
 ```
+
+## Administrador
+
+Credenciales:
+
+```text
+admin@gmail.com / admin
+```
+
+En `#/admin/productos` se puede:
+
+- Crear, editar y desactivar productos.
+- Cargar imagen del producto desde un input file con preview.
+- Guardar la ruta devuelta por el backend en la columna `image`.
+- Crear y editar categorias sin recargar la pagina.
+
+La carga de imagenes usa `POST /api/uploads/product-image`; el backend guarda el archivo en `frontend/assets/img/` y devuelve una ruta relativa como `assets/img/producto.png`.

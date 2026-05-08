@@ -46,8 +46,23 @@ Tecnologias:
 - Spring Boot
 - Spring Web
 - Spring Data JPA
-- H2
+- MySQL
 - Maven
+
+Configurar MySQL:
+
+```powershell
+mysql -u root -p < base-de-datos/schema.sql
+mysql -u root -p tecnostore_db < base-de-datos/seed.sql
+```
+
+Por defecto el backend usa:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/tecnostore_db
+spring.datasource.username=root
+spring.datasource.password=root
+```
 
 Ejecutar:
 
@@ -75,16 +90,27 @@ Usuario:       usuario@gmail.com / usuario
 POST   /api/auth/login
 POST   /api/auth/register
 GET    /api/categories
+POST   /api/categories
+PUT    /api/categories/{id}
 GET    /api/products
 GET    /api/products/{id}
 GET    /api/products/category/{categoryId}
 POST   /api/products
 PUT    /api/products/{id}
 DELETE /api/products/{id}
+POST   /api/uploads/product-image
 POST   /api/orders
 GET    /api/orders
 GET    /api/orders/user/{userId}
 ```
+
+Las acciones administrativas usan el header `X-User-Role: ADMIN`.
+
+## Carga de imagenes
+
+Desde `#/admin/productos`, el administrador puede seleccionar una imagen en el modal de producto. El frontend la envia a `POST /api/uploads/product-image`; Spring Boot la guarda en `frontend/assets/img/` y devuelve una ruta como `assets/img/producto.png`, que se guarda en la columna `image`.
+
+Si el nombre ya existe, el backend genera automaticamente `producto-1.png`, `producto-2.png`, etc.
 
 ## Estructura frontend
 

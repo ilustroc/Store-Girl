@@ -89,7 +89,7 @@ const Cart = (() => {
     function rowTemplate(item) {
         return `
             <div class="cart-line">
-                <img src="${StoreUtils.escapeHtml(item.image)}" alt="${StoreUtils.escapeHtml(item.name)}">
+                <img src="${StoreUtils.escapeHtml(item.image)}" alt="${StoreUtils.escapeHtml(item.name)}" ${StoreUtils.imageFallbackAttr()}>
                 <div>
                     <strong>${StoreUtils.escapeHtml(item.name)}</strong>
                     <div class="text-muted small">${StoreUtils.money(item.price)}</div>

@@ -76,7 +76,7 @@ const Store = (() => {
             const stockClass = product.stock <= 0 ? "empty" : product.stock <= 5 ? "low" : "";
             container.innerHTML = `
                 <div class="product-detail-grid">
-                    <div class="detail-image"><img src="${StoreUtils.escapeHtml(StoreUtils.productImage(product))}" alt="${StoreUtils.escapeHtml(product.name)}"></div>
+                    <div class="detail-image"><img src="${StoreUtils.escapeHtml(StoreUtils.productImage(product))}" alt="${StoreUtils.escapeHtml(product.name)}" ${StoreUtils.imageFallbackAttr()}></div>
                     <div class="detail-info">
                         <span class="badge rounded-pill text-bg-light">${StoreUtils.escapeHtml(StoreUtils.categoryName(product))}</span>
                         <h1>${StoreUtils.escapeHtml(product.name)}</h1>
@@ -105,7 +105,7 @@ const Store = (() => {
             <div class="col-md-6 col-xl-4">
                 <article class="product-card">
                     <a class="product-image" href="#/producto/${product.id}">
-                        <img src="${StoreUtils.escapeHtml(StoreUtils.productImage(product))}" alt="${StoreUtils.escapeHtml(product.name)}">
+                        <img src="${StoreUtils.escapeHtml(StoreUtils.productImage(product))}" alt="${StoreUtils.escapeHtml(product.name)}" ${StoreUtils.imageFallbackAttr()}>
                     </a>
                     <div class="product-body">
                         <div class="d-flex justify-content-between gap-2 mb-2">

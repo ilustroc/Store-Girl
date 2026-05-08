@@ -8,8 +8,31 @@ API REST para la tienda tecnologica universitaria.
 - Spring Boot
 - Spring Web
 - Spring Data JPA
-- H2
+- MySQL
 - Maven
+
+## MySQL
+
+Crear la base y cargar datos iniciales:
+
+```powershell
+mysql -u root -p < ..\base-de-datos\schema.sql
+mysql -u root -p tecnostore_db < ..\base-de-datos\seed.sql
+```
+
+Configuracion usada por `application.properties`:
+
+```properties
+server.port=8080
+server.servlet.context-path=/api
+spring.datasource.url=jdbc:mysql://localhost:3306/tecnostore_db?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.sql.init.mode=never
+```
+
+`schema.sql` y `data.sql` quedan como referencia idempotente, pero no se ejecutan automaticamente para evitar borrar o duplicar datos.
 
 ## Ejecutar
 
@@ -39,28 +62,33 @@ Usuario:       usuario@gmail.com / usuario
 POST   /api/auth/login
 POST   /api/auth/register
 GET    /api/categories
+POST   /api/categories
+PUT    /api/categories/{id}
 GET    /api/products
 GET    /api/products/{id}
 GET    /api/products/category/{categoryId}
 POST   /api/products
 PUT    /api/products/{id}
 DELETE /api/products/{id}
+POST   /api/uploads/product-image
 POST   /api/orders
 GET    /api/orders
 GET    /api/orders/user/{userId}
 ```
 
-Para crear, editar o eliminar productos, enviar el header:
+Para crear, editar o eliminar productos, crear o editar categorias, subir imagenes y ver todos los pedidos, enviar el header:
 
 ```text
 X-User-Role: ADMIN
 ```
 
-## H2 Console
+## Carga de imagenes
 
 ```text
-http://localhost:8080/h2-console
-JDBC URL: jdbc:h2:mem:tecnostore
-User: sa
-Password:
+POST /api/uploads/product-image
+Content-Type: multipart/form-data
+Campo: file
+Respuesta: { "path": "assets/img/nombre-imagen.png" }
 ```
+
+El archivo se guarda en `frontend/assets/img/`. Si el nombre ya existe, se renombra automaticamente.

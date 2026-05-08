@@ -6,16 +6,42 @@
                 <h1>Productos</h1>
                 <p>CRUD de productos conectado a Spring Boot.</p>
             </div>
-            <button class="btn btn-warning" id="btn-new-product">
-                <i class="bi bi-plus-circle me-2"></i>Agregar producto
-            </button>
+            <div class="admin-toolbar">
+                <button class="btn btn-outline-light" id="btn-new-category">
+                    <i class="bi bi-tags me-2"></i>Agregar categoria
+                </button>
+                <button class="btn btn-warning" id="btn-new-product">
+                    <i class="bi bi-plus-circle me-2"></i>Agregar producto
+                </button>
+            </div>
         </div>
     </div>
 </section>
 
 <section class="section-pad bg-white">
     <div class="container">
+        <div class="surface-card mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-3">
+                <div>
+                    <p class="eyebrow mb-1">Categorias</p>
+                    <h2>Organizacion del catalogo</h2>
+                </div>
+                <button class="btn btn-outline-primary" id="btn-new-category-inline">
+                    <i class="bi bi-plus-circle me-2"></i>Agregar categoria
+                </button>
+            </div>
+            <div class="category-manager" id="admin-categories-list"></div>
+        </div>
         <div class="surface-card">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-3">
+                <div>
+                    <p class="eyebrow mb-1">Inventario</p>
+                    <h2>Gestionar productos</h2>
+                </div>
+                <button class="btn btn-primary" id="btn-new-product-inline">
+                    <i class="bi bi-plus-circle me-2"></i>Agregar producto
+                </button>
+            </div>
             <div class="table-responsive">
                 <table class="table align-middle">
                     <thead>
