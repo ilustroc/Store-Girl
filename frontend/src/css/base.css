@@ -1,0 +1,180 @@
+:root {
+    --color-gray: #6B6B6B;
+    --color-cream: #FFFFFA;
+    --color-soft: #F5F5F5;
+    --color-white: #FFFFFF;
+    --color-black: #0D0000;
+    --color-line: rgba(13, 0, 0, 0.12);
+    --color-line-strong: rgba(13, 0, 0, 0.2);
+    --shadow-sm: 0 8px 24px rgba(13, 0, 0, 0.06);
+    --shadow-md: 0 18px 48px rgba(13, 0, 0, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-padding-top: 82px;
+}
+
+body {
+    min-height: 100vh;
+    padding-top: 74px;
+    color: var(--color-black);
+    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--color-cream);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.app-shell {
+    min-height: 64vh;
+}
+
+.btn-primary {
+    color: var(--color-white);
+    border: 1px solid var(--color-black);
+    background: var(--color-black);
+    box-shadow: 0 10px 22px rgba(13, 0, 0, 0.14);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    color: var(--color-white);
+    border-color: var(--color-gray);
+    background: var(--color-gray);
+}
+
+.btn-outline-primary {
+    color: var(--color-black);
+    border-color: var(--color-black);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    color: var(--color-white);
+    border-color: var(--color-black);
+    background: var(--color-black);
+}
+
+.btn-warning {
+    color: var(--color-black);
+    border-color: var(--color-black);
+    background: var(--color-cream);
+}
+
+.btn-warning:hover,
+.btn-warning:focus {
+    color: var(--color-white);
+    border-color: var(--color-black);
+    background: var(--color-black);
+}
+
+.text-primary {
+    color: var(--color-black) !important;
+}
+
+.text-muted {
+    color: var(--color-gray) !important;
+}
+
+.text-danger {
+    color: var(--color-black) !important;
+}
+
+.bg-danger {
+    color: var(--color-white) !important;
+    background-color: var(--color-gray) !important;
+}
+
+.bg-white {
+    background: var(--color-white) !important;
+}
+
+.btn-outline-secondary,
+.btn-outline-danger {
+    color: var(--color-gray);
+    border-color: var(--color-line-strong);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+    color: var(--color-white);
+    border-color: var(--color-black);
+    background: var(--color-black);
+}
+
+.btn-outline-light {
+    color: var(--color-cream);
+    border-color: rgba(255, 255, 250, 0.72);
+}
+
+.btn-outline-light:hover,
+.btn-outline-light:focus {
+    color: var(--color-black);
+    border-color: var(--color-white);
+    background: var(--color-white);
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+    color: var(--color-black);
+    border-color: var(--color-line);
+    background-color: var(--color-white);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-black);
+    box-shadow: 0 0 0 0.2rem rgba(13, 0, 0, 0.12);
+}
+
+.alert-warning,
+.alert-danger,
+.alert-success,
+.alert-info {
+    color: var(--color-black);
+    border-color: var(--color-line);
+    background: var(--color-soft);
+}
+
+.badge.text-bg-light {
+    color: var(--color-black) !important;
+    border: 1px solid var(--color-line);
+    background: var(--color-soft) !important;
+}
+
+.text-bg-success,
+.text-bg-danger,
+.text-bg-warning,
+.text-bg-info,
+.text-bg-secondary {
+    color: var(--color-white) !important;
+    background-color: var(--color-black) !important;
+}
+
+.eyebrow {
+    display: block;
+    color: var(--color-gray);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.route-loading {
+    min-height: 45vh;
+    display: grid;
+    place-items: center;
+}
+
+.spinner-border.text-primary {
+    color: var(--color-black) !important;
+}

@@ -15,7 +15,7 @@ API REST para la tienda tecnologica universitaria.
 
 ```powershell
 cd backend
-mvn spring-boot:run
+.\mvnw.cmd spring-boot:run
 ```
 
 La API queda en:
@@ -23,6 +23,8 @@ La API queda en:
 ```text
 http://localhost:8080/api
 ```
+
+Si ya tienes Maven instalado globalmente, tambien puedes usar `mvn spring-boot:run`.
 
 ## Credenciales
 

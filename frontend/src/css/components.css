@@ -1,0 +1,91 @@
+.feature-card,
+.surface-card,
+.catalog-sidebar,
+.admin-action-card {
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    background: var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.feature-card {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem;
+}
+
+.feature-card i,
+.contact-item i,
+.admin-action-card i {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    color: var(--color-white);
+    border-radius: 8px;
+    background: var(--color-black);
+}
+
+.feature-card span,
+.admin-action-card span {
+    display: block;
+    color: var(--color-gray);
+    font-size: 0.9rem;
+}
+
+.surface-card {
+    padding: 1.25rem;
+}
+
+.table th {
+    color: var(--color-gray);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.table-product {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.table-product img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: var(--color-soft);
+}
+
+.table-product span {
+    display: block;
+    color: var(--color-gray);
+    font-size: 0.84rem;
+}
+
+.empty-state {
+    display: grid;
+    place-items: center;
+    gap: 0.55rem;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.empty-state i {
+    color: var(--color-black);
+    font-size: 2.6rem;
+}
+
+.empty-state.compact {
+    padding: 1.5rem 1rem;
+}
+
+.modal-content,
+.dropdown-menu {
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+}

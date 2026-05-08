@@ -9,7 +9,15 @@ frontend/
 |-- index.html
 |-- assets/img/
 |-- src/
-|   |-- css/styles.css
+|   |-- css/
+|   |   |-- styles.css
+|   |   |-- base.css
+|   |   |-- layout.css
+|   |   |-- components.css
+|   |   |-- catalog.css
+|   |   |-- cart.css
+|   |   |-- auth-admin.css
+|   |   `-- responsive.css
 |   |-- js/
 |   |   |-- app.js
 |   |   |-- router.js

@@ -1,0 +1,230 @@
+.store-navbar {
+    min-height: 74px;
+    background: var(--color-black);
+    box-shadow: 0 12px 30px rgba(13, 0, 0, 0.22);
+    backdrop-filter: blur(12px);
+}
+
+.navbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-weight: 700;
+}
+
+.brand-mark {
+    width: 36px;
+    height: 36px;
+    display: inline-grid;
+    place-items: center;
+    color: var(--color-black);
+    border-radius: 8px;
+    background: var(--color-cream);
+}
+
+.nav-search {
+    width: min(100%, 560px);
+}
+
+.nav-search .form-control,
+.nav-search .input-group-text {
+    border: 0;
+}
+
+.btn-glass {
+    color: var(--color-white);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-glass:hover,
+.btn-glass:focus {
+    color: var(--color-black);
+    background: var(--color-cream);
+}
+
+.cart-nav-btn {
+    width: 38px;
+    height: 38px;
+    display: inline-grid;
+    place-items: center;
+}
+
+.store-navbar .nav-link {
+    color: rgba(255, 255, 255, 0.84);
+    font-weight: 500;
+}
+
+.store-navbar .nav-link:hover,
+.store-navbar .nav-link.active {
+    color: var(--color-white);
+}
+
+.hero-store {
+    padding: 5.5rem 0 5rem;
+    color: var(--color-white);
+    background:
+        linear-gradient(120deg, rgba(13, 0, 0, 0.88), rgba(13, 0, 0, 0.58)),
+        var(--color-gray);
+}
+
+.hero-copy h1 {
+    max-width: 760px;
+    margin: 1rem 0;
+    font-size: clamp(2.2rem, 5vw, 4.4rem);
+    font-weight: 700;
+}
+
+.hero-copy p {
+    max-width: 640px;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 1.1rem;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+}
+
+.hero-badge {
+    color: var(--color-black);
+    background: var(--color-cream);
+}
+
+.hero-card {
+    position: relative;
+    min-height: 390px;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 28px 75px rgba(13, 0, 0, 0.28);
+}
+
+.hero-card img {
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+}
+
+.hero-card-info {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    min-width: 150px;
+    padding: 1rem;
+    color: var(--color-black);
+    border-radius: 8px;
+    background: var(--color-white);
+    box-shadow: var(--shadow-md);
+}
+
+.hero-card-info span {
+    display: block;
+    color: var(--color-gray);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.hero-card-info strong {
+    display: block;
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.feature-band {
+    position: relative;
+    z-index: 2;
+    margin-top: -2rem;
+}
+
+.section-pad {
+    padding: 5rem 0;
+}
+
+.section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.section-heading h2,
+.page-hero h1,
+.auth-card h1,
+.surface-card h2 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.section-heading h2 {
+    font-size: clamp(1.85rem, 3vw, 2.7rem);
+}
+
+.section-heading p:not(.eyebrow),
+.page-hero p {
+    margin: 0.45rem 0 0;
+    color: var(--color-gray);
+}
+
+.page-hero {
+    color: var(--color-white);
+    background: var(--color-black);
+}
+
+.page-hero.compact {
+    padding: 3rem 0;
+}
+
+.page-hero .eyebrow,
+.admin-hero .eyebrow {
+    color: var(--color-cream);
+}
+
+.store-footer {
+    padding: 3rem 0 1.5rem;
+    color: rgba(255, 255, 255, 0.78);
+    background: var(--color-black);
+}
+
+.store-footer h3 {
+    color: var(--color-white);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.store-footer a {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.4rem;
+}
+
+.store-footer a:hover {
+    color: var(--color-white);
+}
+
+.footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.9rem;
+    color: var(--color-white);
+    font-weight: 700;
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.85rem;
+}
