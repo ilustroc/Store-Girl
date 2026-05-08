@@ -1,0 +1,42 @@
+<section class="page-hero compact">
+    <div class="container">
+        <p class="eyebrow">Catalogo</p>
+        <h1>Productos tecnologicos</h1>
+        <p>Filtra por categoria, busca por nombre y agrega productos al carrito.</p>
+    </div>
+</section>
+
+<section class="section-pad bg-white">
+    <div class="container">
+        <div class="catalog-layout">
+            <aside class="catalog-sidebar">
+                <h2>Filtros</h2>
+                <label class="form-label" for="catalog-search">Buscar</label>
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input class="form-control" id="catalog-search" type="search" placeholder="iPhone, laptop...">
+                </div>
+                <label class="form-label" for="catalog-category">Categoria</label>
+                <select class="form-select" id="catalog-category">
+                    <option value="">Todas</option>
+                </select>
+            </aside>
+
+            <div>
+                <div class="catalog-topbar">
+                    <div>
+                        <strong id="catalog-count">0 productos</strong>
+                        <span> disponibles</span>
+                    </div>
+                    <select class="form-select form-select-sm" id="catalog-sort">
+                        <option value="default">Orden recomendado</option>
+                        <option value="price-asc">Menor precio</option>
+                        <option value="price-desc">Mayor precio</option>
+                        <option value="stock-desc">Mayor stock</option>
+                    </select>
+                </div>
+                <div class="row g-4" id="catalog-products"></div>
+            </div>
+        </div>
+    </div>
+</section>

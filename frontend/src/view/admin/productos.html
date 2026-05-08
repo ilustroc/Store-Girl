@@ -1,0 +1,35 @@
+<section class="page-hero compact admin-hero">
+    <div class="container">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-end">
+            <div>
+                <p class="eyebrow">Administrador</p>
+                <h1>Productos</h1>
+                <p>CRUD de productos conectado a Spring Boot.</p>
+            </div>
+            <button class="btn btn-warning" id="btn-new-product">
+                <i class="bi bi-plus-circle me-2"></i>Agregar producto
+            </button>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad bg-white">
+    <div class="container">
+        <div class="surface-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoria</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-products-table"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

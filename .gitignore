@@ -1,5 +1,5 @@
-backend/out/
-backend/lib/*.jar
+backend/target/
+backend/.mvn-cache/
 backend/*.log
 frontend/*.log
 base-de-datos/data/*.db

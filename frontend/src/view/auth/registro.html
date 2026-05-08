@@ -1,0 +1,30 @@
+<section class="auth-page">
+    <div class="auth-card">
+        <p class="eyebrow">Cuenta</p>
+        <h1>Crear cuenta</h1>
+        <p class="text-muted">Registra un usuario comprador para probar pedidos.</p>
+        <form id="register-page-form">
+            <div class="mb-3">
+                <label class="form-label" for="register-name">Nombre completo</label>
+                <input class="form-control" id="register-name" type="text" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="register-email">Correo</label>
+                <input class="form-control" id="register-email" type="email" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="register-phone">Telefono</label>
+                <input class="form-control" id="register-phone" type="tel">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="register-password">Password</label>
+                <input class="form-control" id="register-password" type="password" minlength="4" required>
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Registrarme</button>
+        </form>
+        <div class="auth-switch">
+            <span>Ya tienes cuenta?</span>
+            <a href="#/login">Ingresar</a>
+        </div>
+    </div>
+</section>

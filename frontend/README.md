@@ -1,26 +1,60 @@
-# Frontend Bootstrap - Tecno Store
+# Frontend Bootstrap - TecnoStore
 
-Interfaz del ecommerce con Bootstrap 5, catalogo conectado al backend Java y panel administrativo.
+SPA simple con HTML, CSS, JavaScript, Bootstrap 5 y hash routing.
+
+## Estructura
+
+```text
+frontend/
+|-- index.html
+|-- assets/img/
+|-- src/
+|   |-- css/styles.css
+|   |-- js/
+|   |   |-- app.js
+|   |   |-- router.js
+|   |   |-- api.js
+|   |   |-- auth.js
+|   |   |-- cart.js
+|   |   |-- store.js
+|   |   |-- admin.js
+|   |   |-- components.js
+|   |   `-- utils.js
+|   `-- view/
+|       |-- layout/
+|       |-- public/
+|       |-- auth/
+|       |-- user/
+|       `-- admin/
+`-- dev-server.js
+```
 
 ## Ejecutar
 
-Desde `frontend`:
-
 ```powershell
-node dev-server.js
+cd frontend
+node dev-server.js 5501
 ```
 
 Abrir:
 
 ```text
-http://localhost:5500
+http://localhost:5501
 ```
 
 El backend debe estar activo en `http://localhost:8080/api`.
 
-## Credenciales demo
+## Rutas
 
 ```text
-Admin:   admin@gmail.com / admin
-Usuario: usuario@gmail.com / usuario
+#/home
+#/catalogo
+#/producto/:id
+#/carrito
+#/checkout
+#/login
+#/registro
+#/mis-pedidos
+#/admin
+#/admin/productos
 ```

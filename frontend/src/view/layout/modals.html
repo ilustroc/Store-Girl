@@ -1,0 +1,48 @@
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <p class="eyebrow mb-1">Administrador</p>
+                    <h5 class="modal-title" id="productModalLabel">Producto</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form id="product-form">
+                <div class="modal-body">
+                    <input type="hidden" id="product-id">
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <label class="form-label" for="product-name">Nombre</label>
+                            <input class="form-control" id="product-name" type="text" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label" for="product-category">Categoria</label>
+                            <select class="form-select" id="product-category" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="product-price">Precio</label>
+                            <input class="form-control" id="product-price" type="number" min="0" step="0.01" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="product-stock">Stock</label>
+                            <input class="form-control" id="product-stock" type="number" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="product-image">Imagen</label>
+                            <input class="form-control" id="product-image" type="text" placeholder="assets/img/producto.png">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="product-description">Descripcion</label>
+                            <textarea class="form-control" id="product-description" rows="4" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Guardar producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

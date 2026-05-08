@@ -1,65 +1,118 @@
-# Tecno Store
+# TecnoStore
 
-Proyecto reorganizado en frontend, backend y base de datos.
+TecnoStore es un proyecto universitario de ecommerce tecnologico. El sistema incluye frontend con rutas dinamicas, backend Spring Boot, base de datos normalizada, carrito, checkout, pedidos, login con roles y CRUD de productos.
+
+No incluye modulo de reportes por ahora.
+
+## Arquitectura
 
 ```text
-Store/
+STORE/
 |-- frontend/
-|   |-- index.html
-|   |-- css/
-|   |-- js/
-|   `-- assets/img/
 |-- backend/
-|   |-- src/com/tecnostore/
-|   |-- scripts/
-|   `-- lib/
 |-- base-de-datos/
-|   |-- schema.sql
-|   |-- seed.sql
-|   `-- consultas.sql
 |-- documentacion/
 `-- _legacy_original/
 ```
 
-## Como ejecutar
+## Frontend
 
-1. Backend:
+Tecnologias:
 
-```powershell
-cd backend
-.\scripts\run.ps1
-```
+- HTML
+- CSS
+- JavaScript
+- Bootstrap 5
+- Hash routing
 
-2. Frontend en otra terminal:
+Ejecutar:
 
 ```powershell
 cd frontend
-node dev-server.js
+node dev-server.js 5501
 ```
 
-3. Abrir:
+Abrir:
 
 ```text
-http://localhost:5500
+http://localhost:5501
 ```
 
-## Credenciales
+## Backend
+
+Tecnologias:
+
+- Java 17
+- Spring Boot
+- Spring Web
+- Spring Data JPA
+- H2
+- Maven
+
+Ejecutar:
+
+```powershell
+cd backend
+mvn spring-boot:run
+```
+
+API:
+
+```text
+http://localhost:8080/api
+```
+
+## Credenciales de prueba
 
 ```text
 Administrador: admin@gmail.com / admin
-Usuario demo:   usuario@gmail.com / usuario
+Usuario:       usuario@gmail.com / usuario
 ```
 
-## Que se implemento
+## Endpoints principales
 
-- Frontend con Bootstrap 5.
-- Navbar, hero, catalogo, carrito y modales.
-- Login/registro de usuario.
-- Rol administrador.
-- Panel admin con `+ Agregar producto`.
-- Productos guardados en base de datos H2.
-- API REST en Java 17.
-- Pedidos con detalle y actualizacion de estado.
-- Scripts SQL y documentacion tecnica para la entrega.
+```text
+POST   /api/auth/login
+POST   /api/auth/register
+GET    /api/categories
+GET    /api/products
+GET    /api/products/{id}
+GET    /api/products/category/{categoryId}
+POST   /api/products
+PUT    /api/products/{id}
+DELETE /api/products/{id}
+POST   /api/orders
+GET    /api/orders
+GET    /api/orders/user/{userId}
+```
 
-La version original quedo archivada en `_legacy_original`.
+## Estructura frontend
+
+```text
+frontend/
+|-- index.html
+|-- assets/img/
+`-- src/
+    |-- css/
+    |-- js/
+    `-- view/
+        |-- layout/
+        |-- public/
+        |-- auth/
+        |-- user/
+        `-- admin/
+```
+
+## Estructura backend
+
+```text
+backend/
+|-- pom.xml
+`-- src/main/
+    |-- java/com/tecnostore/
+    `-- resources/
+```
+
+## Documentacion
+
+La carpeta `documentacion/` contiene contexto, SRS, alternativas, diseno tecnico, BPM, base de datos, UML, prototipo UX/UI, Project Charter y Gantt.
