@@ -1,0 +1,30 @@
+@startuml
+title TecnoStore - Flujo administrativo de producto
+
+actor Administrador
+participant "Frontend Admin" as FrontendAdmin
+participant UploadController
+participant ProductController
+participant ProductService
+participant ProductRepository
+database MySQL
+folder "frontend/assets/img" as Assets
+
+Administrador -> FrontendAdmin : selecciona imagen
+FrontendAdmin -> UploadController : POST /uploads/product-image
+UploadController -> UploadController : valida tipo y tamano
+UploadController -> Assets : guarda archivo
+Assets --> UploadController : archivo disponible
+UploadController --> FrontendAdmin : path assets/img/nombre.png
+
+Administrador -> FrontendAdmin : completa datos del producto
+FrontendAdmin -> ProductController : POST /products + ProductRequest
+ProductController -> ProductService : create(request)
+ProductService -> ProductRepository : save(product)
+ProductRepository -> MySQL : INSERT products
+MySQL --> ProductRepository : producto guardado
+ProductRepository --> ProductService : producto
+ProductService --> ProductController : producto
+ProductController --> FrontendAdmin : respuesta JSON
+FrontendAdmin --> Administrador : muestra producto en tabla
+@enduml

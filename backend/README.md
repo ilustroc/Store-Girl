@@ -20,6 +20,8 @@ mysql -u root -p < ..\base-de-datos\schema.sql
 mysql -u root -p tecnostore_db < ..\base-de-datos\seed.sql
 ```
 
+El seed agrega compradores y pedidos de muestra para poblar el panel de control administrativo.
+
 Configuracion usada por `application.properties`:
 
 ```properties
@@ -64,6 +66,8 @@ POST   /api/auth/register
 GET    /api/categories
 POST   /api/categories
 PUT    /api/categories/{id}
+GET    /api/admin/dashboard
+GET    /api/admin/indicators
 GET    /api/products
 GET    /api/products/{id}
 GET    /api/products/category/{categoryId}
@@ -71,6 +75,9 @@ POST   /api/products
 PUT    /api/products/{id}
 DELETE /api/products/{id}
 POST   /api/uploads/product-image
+POST   /api/analytics/visit
+POST   /api/analytics/performance
+POST   /api/analytics/cart
 POST   /api/orders
 GET    /api/orders
 GET    /api/orders/user/{userId}

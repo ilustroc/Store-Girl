@@ -15,9 +15,10 @@ const Cart = (() => {
         }
     }
 
-    function save() {
+    function save(status = items.length ? "ACTIVE" : "ABANDONED") {
         localStorage.setItem(key, JSON.stringify(items));
         renderBadge();
+        trackCart(status);
     }
 
     function add(product) {
@@ -71,9 +72,9 @@ const Cart = (() => {
         renderCheckout();
     }
 
-    function clear() {
+    function clear(status = "ABANDONED") {
         items = [];
-        save();
+        save(status);
     }
 
     function total() {
@@ -131,7 +132,7 @@ const Cart = (() => {
         if (userBox) {
             userBox.innerHTML = user
                 ? `<div class="checkout-user"><strong>${StoreUtils.escapeHtml(user.fullName)}</strong><span>${StoreUtils.escapeHtml(user.email)}</span></div>`
-                : `<div class="alert alert-warning">Debes iniciar sesion para confirmar la compra.</div>`;
+                : `<div class="alert alert-warning">Debes iniciar sesión para confirmar la compra.</div>`;
         }
         const checkoutTotal = document.getElementById("checkout-total");
         if (checkoutTotal) checkoutTotal.textContent = StoreUtils.money(total());
@@ -152,7 +153,7 @@ const Cart = (() => {
                 userId: Auth.session().id,
                 items: items.map(item => ({ productId: item.productId, quantity: item.quantity }))
             });
-            clear();
+            clear("COMPLETED");
             await Store.refresh();
             StoreUtils.toast("Pedido confirmado correctamente", "success");
             location.hash = "#/mis-pedidos";
@@ -167,6 +168,14 @@ const Cart = (() => {
         document.querySelectorAll("[data-cart-minus]").forEach(button => button.onclick = () => change(button.dataset.cartMinus, -1));
         document.querySelectorAll("[data-cart-plus]").forEach(button => button.onclick = () => change(button.dataset.cartPlus, 1));
         document.querySelectorAll("[data-cart-remove]").forEach(button => button.onclick = () => remove(button.dataset.cartRemove));
+    }
+
+    function trackCart(status) {
+        Api.trackCart({
+            userId: Auth.session()?.id || null,
+            sessionId: StoreUtils.analyticsSessionId(),
+            status
+        }).catch(() => {});
     }
 
     return { init, add, renderCartPage, renderCheckout, clear, total };

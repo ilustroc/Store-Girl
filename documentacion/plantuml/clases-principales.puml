@@ -1,0 +1,74 @@
+@startuml
+title TecnoStore - Clases principales
+
+class User {
+  Long id
+  String fullName
+  String email
+  String password
+  Role role
+  Boolean active
+}
+
+class Category {
+  Long id
+  String name
+  String description
+}
+
+class Product {
+  Long id
+  String name
+  BigDecimal price
+  BigDecimal costPrice
+  Integer stock
+  String image
+  Boolean active
+}
+
+class Order {
+  Long id
+  BigDecimal total
+  OrderStatus status
+  LocalDateTime createdAt
+}
+
+class OrderItem {
+  Long id
+  Integer quantity
+  BigDecimal unitPrice
+  BigDecimal subtotal
+}
+
+class ProductRequest {
+  name
+  description
+  categoryId
+  price
+  stock
+  image
+}
+
+class OrderRequest {
+  userId
+  items
+}
+
+class ProductService
+class OrderService
+interface ProductRepository
+interface OrderRepository
+
+Category "1" <-- "0..*" Product
+User "1" <-- "0..*" Order
+Order "1" *-- "1..*" OrderItem
+Product "1" <-- "0..*" OrderItem
+
+ProductService --> ProductRepository
+ProductService --> ProductRequest
+OrderService --> OrderRepository
+OrderService --> ProductRepository
+OrderService --> OrderRequest
+ProductRepository --> Product
+OrderRepository --> Order
+@enduml

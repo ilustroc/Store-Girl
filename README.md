@@ -56,6 +56,8 @@ mysql -u root -p < base-de-datos/schema.sql
 mysql -u root -p tecnostore_db < base-de-datos/seed.sql
 ```
 
+El seed incluye compradores y pedidos de muestra para que el dashboard administrativo tenga actividad desde el primer arranque.
+
 Por defecto el backend usa:
 
 ```properties
@@ -92,6 +94,8 @@ POST   /api/auth/register
 GET    /api/categories
 POST   /api/categories
 PUT    /api/categories/{id}
+GET    /api/admin/dashboard
+GET    /api/admin/indicators
 GET    /api/products
 GET    /api/products/{id}
 GET    /api/products/category/{categoryId}
@@ -99,6 +103,9 @@ POST   /api/products
 PUT    /api/products/{id}
 DELETE /api/products/{id}
 POST   /api/uploads/product-image
+POST   /api/analytics/visit
+POST   /api/analytics/performance
+POST   /api/analytics/cart
 POST   /api/orders
 GET    /api/orders
 GET    /api/orders/user/{userId}
@@ -150,3 +157,21 @@ backend/
 ## Documentacion
 
 La carpeta `documentacion/` contiene contexto, SRS, alternativas, diseno tecnico, BPM, base de datos, UML, prototipo UX/UI, Project Charter y Gantt.
+
+Los diagramas tecnicos estan en `documentacion/plantuml/` y usan PlantUML:
+
+```text
+arquitectura-general.puml
+mvc.puml
+repository-pattern.puml
+dto-pattern.puml
+flujo-compra.puml
+flujo-admin-producto.puml
+clases-principales.puml
+erd-base-datos.puml
+dashboard-indicadores.puml
+```
+
+Pueden renderizarse con la extension PlantUML en VS Code, PlantUML online o cualquier visor compatible.
+
+La documentacion de los ocho indicadores de gestion esta en `documentacion/11-indicadores-gestion.md`.

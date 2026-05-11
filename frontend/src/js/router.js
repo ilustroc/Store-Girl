@@ -23,16 +23,34 @@ const Router = (() => {
         const match = routes.find(route => route.pattern.test(path)) || routes[1];
         const params = [...path.match(match.pattern)].slice(1);
         const app = document.getElementById("app");
+        const routeStart = performance.now();
         app.innerHTML = `<div class="route-loading"><div class="spinner-border text-primary" role="status"></div></div>`;
         try {
             app.innerHTML = await Components.loadView(match.view);
             await match.handler({ params, query, id: params[0] });
+            trackRoute(path, Math.round(performance.now() - routeStart));
             setActiveLink(path);
             window.scrollTo({ top: 0, behavior: "smooth" });
             bootstrap.Collapse.getInstance(document.getElementById("mainNavbar"))?.hide();
         } catch (error) {
             app.innerHTML = `<div class="container section-pad"><div class="alert alert-danger">${StoreUtils.escapeHtml(error.message)}</div></div>`;
         }
+    }
+
+    function trackRoute(path, loadTimeMs) {
+        const page = pageName(path);
+        if (!page) return;
+        Api.trackVisit({ page, source: "web", sessionId: StoreUtils.analyticsSessionId() }).catch(() => {});
+        if (page === "catalogo") {
+            Api.trackPerformance({ page, loadTimeMs }).catch(() => {});
+        }
+    }
+
+    function pageName(path) {
+        if (path === "/" || path === "/home") return "home";
+        if (path === "/catalogo") return "catalogo";
+        if (/^\/producto\/\d+$/.test(path)) return "producto";
+        return "";
     }
 
     function parseHash() {
@@ -72,7 +90,7 @@ const Router = (() => {
                         <td><span class="badge text-bg-${StoreUtils.orderStatusClass(order.status)}">${order.status}</span></td>
                     </tr>
                 `).join("")
-                : `<tr><td colspan="5" class="text-center text-muted py-4">Todavia no tienes pedidos.</td></tr>`;
+                : `<tr><td colspan="5" class="text-center text-muted py-4">Todavía no tienes pedidos.</td></tr>`;
         } catch (error) {
             table.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">${StoreUtils.escapeHtml(error.message)}</td></tr>`;
         }

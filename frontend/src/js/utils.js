@@ -42,7 +42,7 @@ const StoreUtils = (() => {
     }
 
     function categoryName(product) {
-        return product?.category?.name || "Sin categoria";
+        return product?.category?.name || "Sin categoría";
     }
 
     function productImage(product) {
@@ -68,5 +68,15 @@ const StoreUtils = (() => {
         }[status] || "secondary";
     }
 
-    return { money, date, escapeHtml, toast, categoryName, productImage, imageFallbackAttr, orderStatusClass };
+    function analyticsSessionId() {
+        const key = "tecnostore.analyticsSession";
+        let id = localStorage.getItem(key);
+        if (!id) {
+            id = `ts-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            localStorage.setItem(key, id);
+        }
+        return id;
+    }
+
+    return { money, date, escapeHtml, toast, categoryName, productImage, imageFallbackAttr, orderStatusClass, analyticsSessionId };
 })();

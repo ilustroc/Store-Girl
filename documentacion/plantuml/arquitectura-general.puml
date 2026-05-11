@@ -1,0 +1,32 @@
+@startuml
+title TecnoStore - Arquitectura general
+left to right direction
+
+actor Usuario
+actor Administrador
+
+rectangle "Frontend\nHTML + Bootstrap 5 + JavaScript" as Frontend {
+  component "Rutas hash\n#/home, #/catalogo, #/admin" as Routes
+  component "Carrito y checkout" as Cart
+  component "Panel administrador" as AdminUI
+}
+
+rectangle "Backend\nAPI REST Spring Boot" as Backend {
+  component "Controllers" as Controllers
+  component "Services" as Services
+  component "Repositories" as Repositories
+}
+
+database "MySQL\ntecnostore_db" as MySQL
+folder "frontend/assets/img\nImagenes de productos" as Assets
+
+Usuario --> Frontend : compra productos
+Administrador --> AdminUI : gestiona catalogo
+Frontend --> Controllers : HTTP / JSON
+AdminUI --> Controllers : HTTP / JSON + X-User-Role
+Controllers --> Services
+Services --> Repositories
+Repositories --> MySQL
+Controllers --> Assets : upload de imagenes
+Frontend --> Assets : muestra imagenes
+@enduml

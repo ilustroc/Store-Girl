@@ -1,0 +1,70 @@
+@startuml
+title TecnoStore - Patron MVC por capas
+left to right direction
+
+package "View" {
+  component "HTML" as Html
+  component "Bootstrap 5" as Bootstrap
+  component "JavaScript Router" as JsRouter
+}
+
+package "Controller" {
+  component "AuthController" as AuthController
+  component "ProductController" as ProductController
+  component "CategoryController" as CategoryController
+  component "OrderController" as OrderController
+  component "AdminController" as AdminController
+  component "UploadController" as UploadController
+}
+
+package "Service" {
+  component "AuthService" as AuthService
+  component "ProductService" as ProductService
+  component "CategoryService" as CategoryService
+  component "OrderService" as OrderService
+  component "AdminDashboardService" as AdminDashboardService
+}
+
+package "Model" {
+  class User
+  class Category
+  class Product
+  class Order
+  class OrderItem
+}
+
+package "Repository" {
+  interface UserRepository
+  interface CategoryRepository
+  interface ProductRepository
+  interface OrderRepository
+}
+
+database "MySQL" as MySQL
+
+Html --> JsRouter
+Bootstrap --> Html
+JsRouter --> AuthController
+JsRouter --> ProductController
+JsRouter --> CategoryController
+JsRouter --> OrderController
+JsRouter --> AdminController
+JsRouter --> UploadController
+AuthController --> AuthService
+ProductController --> ProductService
+CategoryController --> CategoryService
+OrderController --> OrderService
+AdminController --> AdminDashboardService
+ProductService --> Product
+CategoryService --> Category
+OrderService --> Order
+OrderService --> OrderItem
+AuthService --> UserRepository
+ProductService --> ProductRepository
+CategoryService --> CategoryRepository
+OrderService --> OrderRepository
+ProductRepository --> MySQL
+CategoryRepository --> MySQL
+OrderRepository --> MySQL
+UserRepository --> MySQL
+@enduml

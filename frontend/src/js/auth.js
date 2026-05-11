@@ -27,7 +27,7 @@ const Auth = (() => {
         localStorage.removeItem(key);
         Cart.clear();
         refreshUi();
-        StoreUtils.toast("Sesion cerrada", "secondary");
+        StoreUtils.toast("Sesión cerrada", "secondary");
         location.hash = "#/home";
     }
 
@@ -86,7 +86,7 @@ const Auth = (() => {
 
     function requireAuth() {
         if (!session()) {
-            StoreUtils.toast("Inicia sesion para continuar", "warning");
+            StoreUtils.toast("Inicia sesión para continuar", "warning");
             location.hash = "#/login";
             return false;
         }

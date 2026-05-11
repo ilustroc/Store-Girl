@@ -89,3 +89,7 @@ En `#/admin/productos` se puede:
 - Crear y editar categorias sin recargar la pagina.
 
 La carga de imagenes usa `POST /api/uploads/product-image`; el backend guarda el archivo en `frontend/assets/img/` y devuelve una ruta relativa como `assets/img/producto.png`.
+
+En `#/admin` se muestra el panel de control con resumen de productos, categorias, pedidos, productos activos, bajo stock, ultimos pedidos y accesos rapidos de administracion.
+
+El dashboard administrador tambien incluye ocho indicadores de gestion con tarjetas, tablas y graficos: rotacion de inventario, ventas diarias, rentabilidad, efectividad de stock minimo, conversion, abandono de carrito, tiempo de carga y pedidos confirmados.

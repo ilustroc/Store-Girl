@@ -1,0 +1,85 @@
+@startuml
+title TecnoStore - DTO Pattern
+left to right direction
+
+actor Cliente
+component "Frontend" as Frontend
+component "Controllers" as Controllers
+component "Services" as Services
+
+package "DTOs de entrada" {
+  class LoginRequest {
+    email
+    password
+  }
+  class RegisterRequest {
+    fullName
+    email
+    password
+    phone
+  }
+  class ProductRequest {
+    name
+    description
+    categoryId
+    price
+    stock
+    image
+  }
+  class OrderRequest {
+    userId
+    items
+  }
+  class OrderItemRequest {
+    productId
+    quantity
+  }
+}
+
+package "DTOs de salida" {
+  class LoginResponse {
+    id
+    fullName
+    email
+    role
+    phone
+  }
+  class AdminDashboardResponse {
+    totalProducts
+    totalCategories
+    latestOrders
+    lowStockList
+  }
+}
+
+package "Entidades JPA" {
+  class User {
+    password
+    role
+    active
+  }
+  class Product
+  class Order
+}
+
+Cliente --> Frontend
+Frontend --> Controllers : envia DTO
+Controllers --> Services : valida y procesa
+Services --> User
+Services --> Product
+Services --> Order
+Controllers --> Frontend : responde DTO
+LoginRequest --> Controllers
+RegisterRequest --> Controllers
+ProductRequest --> Controllers
+OrderRequest --> Controllers
+OrderItemRequest --> OrderRequest
+Controllers --> LoginResponse
+Controllers --> AdminDashboardResponse
+
+note right of LoginResponse
+Los DTOs evitan exponer campos internos
+como password o relaciones completas
+cuando no son necesarias.
+end note
+@enduml

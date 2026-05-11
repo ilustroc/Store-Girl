@@ -9,4 +9,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByActiveTrueOrderByIdDesc();
 
     List<Product> findByCategoryIdAndActiveTrueOrderByIdDesc(Long categoryId);
+
+    long countByActiveTrue();
+
+    long countByActiveTrueAndStockLessThanEqual(Integer stock);
+
+    List<Product> findTop5ByActiveTrueAndStockLessThanEqualOrderByStockAscNameAsc(Integer stock);
 }

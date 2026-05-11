@@ -44,6 +44,46 @@
     gap: 0.75rem;
 }
 
+.admin-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.admin-stat-card {
+    min-height: 150px;
+    display: grid;
+    gap: 0.45rem;
+    align-content: center;
+    padding: 1.15rem;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    background: var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-stat-card i {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    color: var(--color-white);
+    border-radius: 8px;
+    background: var(--color-black);
+}
+
+.admin-stat-card span {
+    color: var(--color-gray);
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.admin-stat-card strong {
+    color: var(--color-black);
+    font-size: 2rem;
+    line-height: 1;
+}
+
 .category-manager {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -109,4 +149,207 @@
 .image-upload-status {
     color: var(--color-gray);
     font-size: 0.85rem;
+}
+
+.admin-action-card.compact {
+    min-height: 160px;
+}
+
+.admin-action-card.as-button {
+    width: 100%;
+    text-align: left;
+    border: 1px solid var(--color-line);
+    background: var(--color-white);
+}
+
+.dashboard-stock-list {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.dashboard-stock-item {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    gap: 0.85rem;
+    align-items: center;
+    padding: 0.8rem;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    background: var(--color-soft);
+}
+
+.dashboard-stock-item:hover {
+    border-color: var(--color-line-strong);
+    background: var(--color-white);
+}
+
+.dashboard-stock-item img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: var(--color-white);
+}
+
+.dashboard-stock-item strong,
+.dashboard-stock-item span {
+    display: block;
+}
+
+.dashboard-stock-item span {
+    color: var(--color-gray);
+    font-size: 0.86rem;
+}
+
+.executive-dashboard {
+    background: var(--color-soft) !important;
+}
+
+.dashboard-section {
+    margin-bottom: 2rem;
+}
+
+.dashboard-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-section-heading h2 {
+    margin: 0;
+    font-size: clamp(1.3rem, 2vw, 1.9rem);
+    font-weight: 700;
+}
+
+.indicator-card {
+    height: 100%;
+    padding: 1.15rem;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    background: var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.indicator-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+}
+
+.indicator-heading h3 {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 700;
+}
+
+.indicator-heading p {
+    margin: 0.35rem 0 0;
+    color: var(--color-gray);
+    font-size: 0.88rem;
+}
+
+.indicator-status {
+    flex: 0 0 auto;
+    padding: 0.32rem 0.55rem;
+    border-radius: 999px;
+    color: var(--color-white);
+    background: var(--color-gray);
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.indicator-status.good {
+    background: var(--color-black);
+}
+
+.indicator-status.attention {
+    color: var(--color-black);
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-soft);
+}
+
+.indicator-status.critical {
+    background: var(--color-gray);
+}
+
+.indicator-value {
+    margin-bottom: 0.85rem;
+    color: var(--color-black);
+    font-size: clamp(1.45rem, 3vw, 2.3rem);
+    font-weight: 700;
+    line-height: 1;
+}
+
+.indicator-message {
+    margin-bottom: 0.85rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    color: var(--color-gray);
+    background: var(--color-soft);
+    font-size: 0.86rem;
+}
+
+.indicator-meta {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.indicator-meta div,
+.mini-metrics > div:not(.stock-watchlist) {
+    padding: 0.7rem;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    background: var(--color-soft);
+}
+
+.indicator-meta span,
+.mini-metrics > div:not(.stock-watchlist) span {
+    display: block;
+    color: var(--color-gray);
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.indicator-meta strong,
+.mini-metrics > div:not(.stock-watchlist) strong {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--color-black);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.chart-box {
+    position: relative;
+    height: 310px;
+}
+
+.compact-chart {
+    height: 250px;
+}
+
+.mini-metrics {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.stock-watchlist {
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    padding: 0.85rem;
+    background: var(--color-white);
+}
+
+.stock-watchlist h4 {
+    margin-bottom: 0.75rem;
+    color: var(--color-black);
+    font-size: 0.92rem;
+    font-weight: 700;
 }

@@ -54,6 +54,8 @@ const Api = (() => {
         getCategories: () => request("/categories"),
         createCategory: category => request("/categories", { method: "POST", body: category }),
         updateCategory: (id, category) => request(`/categories/${id}`, { method: "PUT", body: category }),
+        getAdminDashboard: () => request("/admin/dashboard"),
+        getAdminIndicators: () => request("/admin/indicators"),
         getProducts: () => request("/products"),
         getProduct: id => request(`/products/${id}`),
         getProductsByCategory: categoryId => request(`/products/category/${categoryId}`),
@@ -65,6 +67,9 @@ const Api = (() => {
         register: user => request("/auth/register", { method: "POST", body: user }),
         createOrder: order => request("/orders", { method: "POST", body: order }),
         getOrders: () => request("/orders"),
-        getOrdersByUser: userId => request(`/orders/user/${userId}`)
+        getOrdersByUser: userId => request(`/orders/user/${userId}`),
+        trackVisit: event => request("/analytics/visit", { method: "POST", body: event }),
+        trackPerformance: event => request("/analytics/performance", { method: "POST", body: event }),
+        trackCart: event => request("/analytics/cart", { method: "POST", body: event })
     };
 })();

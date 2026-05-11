@@ -1,34 +1,15 @@
 # 07. Diagrama de clases
 
-```mermaid
-classDiagram
-    class TecnoStoreApplication
-    class AuthController
-    class ProductController
-    class OrderController
-    class AuthService
-    class ProductService
-    class OrderService
-    class UserRepository
-    class ProductRepository
-    class OrderRepository
-    class User
-    class Category
-    class Product
-    class Order
-    class OrderItem
+El diagrama de clases principal fue documentado en PlantUML para representar entidades, DTOs, servicios y repositorios relevantes del sistema.
 
-    AuthController --> AuthService
-    ProductController --> ProductService
-    OrderController --> OrderService
-    AuthService --> UserRepository
-    ProductService --> ProductRepository
-    ProductService --> Category
-    OrderService --> OrderRepository
-    OrderService --> ProductRepository
-    OrderService --> UserRepository
-    Product --> Category
-    Order --> User
-    Order --> OrderItem
-    OrderItem --> Product
-```
+Archivo principal:
+
+- `plantuml/clases-principales.puml`
+
+Diagramas complementarios:
+
+- `plantuml/mvc.puml`
+- `plantuml/repository-pattern.puml`
+- `plantuml/dto-pattern.puml`
+
+Los archivos pueden renderizarse con la extension PlantUML en VS Code, PlantUML online o cualquier visor compatible.

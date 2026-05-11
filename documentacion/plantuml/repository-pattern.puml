@@ -1,0 +1,43 @@
+@startuml
+title TecnoStore - Repository Pattern
+left to right direction
+
+package "Productos" {
+  component ProductController
+  component ProductService
+  interface ProductRepository
+}
+
+package "Categorias" {
+  component CategoryController
+  component CategoryService
+  interface CategoryRepository
+}
+
+package "Pedidos" {
+  component OrderController
+  component OrderService
+  interface OrderRepository
+  interface OrderItemRepository
+  interface UserRepository
+}
+
+database MySQL
+
+ProductController --> ProductService
+ProductService --> ProductRepository
+ProductRepository --> MySQL
+
+CategoryController --> CategoryService
+CategoryService --> CategoryRepository
+CategoryRepository --> MySQL
+
+OrderController --> OrderService
+OrderService --> OrderRepository
+OrderService --> OrderItemRepository
+OrderService --> ProductRepository
+OrderService --> UserRepository
+OrderRepository --> MySQL
+OrderItemRepository --> MySQL
+UserRepository --> MySQL
+@enduml

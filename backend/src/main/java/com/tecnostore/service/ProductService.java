@@ -7,6 +7,7 @@ import com.tecnostore.repository.CategoryRepository;
 import com.tecnostore.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -59,6 +60,7 @@ public class ProductService {
         product.setDescription(request.description());
         product.setCategory(category);
         product.setPrice(request.price());
+        product.setCostPrice(request.costPrice() == null ? BigDecimal.ZERO : request.costPrice());
         product.setStock(request.stock());
         product.setImage(request.image());
     }

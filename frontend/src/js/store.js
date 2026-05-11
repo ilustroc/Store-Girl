@@ -14,7 +14,7 @@ const Store = (() => {
         } catch (error) {
             products = [];
             categories = [];
-            StoreUtils.toast("No se pudo conectar con el backend", "danger");
+            StoreUtils.toast("No pudimos cargar la tienda en este momento", "danger");
         }
     }
 

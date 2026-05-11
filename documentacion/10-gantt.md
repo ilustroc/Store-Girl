@@ -1,18 +1,15 @@
 # 10. Gantt
 
-```mermaid
-gantt
-    title Plan de trabajo TecnoStore
-    dateFormat  YYYY-MM-DD
-    section Analisis
-    Contexto y requerimientos      :done, a1, 2026-05-01, 2d
-    Alternativas de solucion       :done, a2, after a1, 1d
-    section Diseno
-    Base de datos y UML            :done, d1, 2026-05-04, 2d
-    Prototipo UX/UI                :done, d2, after d1, 2d
-    section Implementacion
-    Backend Spring Boot            :active, i1, 2026-05-07, 2d
-    Frontend con rutas             :active, i2, 2026-05-07, 2d
-    section Pruebas
-    Pruebas funcionales locales    :p1, 2026-05-09, 1d
-```
+## Plan de trabajo TecnoStore
+
+| Fase | Actividad | Estado | Inicio | Duracion |
+| --- | --- | --- | --- | --- |
+| Analisis | Contexto y requerimientos | Completado | 2026-05-01 | 2 dias |
+| Analisis | Alternativas de solucion | Completado | 2026-05-03 | 1 dia |
+| Diseno | Base de datos y UML | Completado | 2026-05-04 | 2 dias |
+| Diseno | Prototipo UX/UI | Completado | 2026-05-06 | 2 dias |
+| Implementacion | Backend Spring Boot | En progreso | 2026-05-07 | 2 dias |
+| Implementacion | Frontend con rutas | En progreso | 2026-05-07 | 2 dias |
+| Pruebas | Pruebas funcionales locales | Planificado | 2026-05-09 | 1 dia |
+
+Los diagramas tecnicos se mantienen en PlantUML dentro de `documentacion/plantuml/`.

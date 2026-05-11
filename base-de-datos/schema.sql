@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS products (
     description VARCHAR(500) NOT NULL,
     category_id BIGINT NOT NULL,
     price DECIMAL(12, 2) NOT NULL,
+    cost_price DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
     stock INT NOT NULL,
     image VARCHAR(250),
     active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -52,4 +53,40 @@ CREATE TABLE IF NOT EXISTS order_items (
     subtotal DECIMAL(12, 2) NOT NULL,
     CONSTRAINT fk_order_items_orders FOREIGN KEY (order_id) REFERENCES orders(id),
     CONSTRAINT fk_order_items_products FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+CREATE TABLE IF NOT EXISTS site_visits (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    session_id VARCHAR(120) NOT NULL,
+    visited_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    source VARCHAR(80),
+    page VARCHAR(80) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS carts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT,
+    session_id VARCHAR(120) NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_carts_users FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS performance_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    page VARCHAR(80) NOT NULL,
+    load_time_ms BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS stock_alerts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    alert_type VARCHAR(40) NOT NULL,
+    stock_at_alert INT NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    attended_at TIMESTAMP NULL,
+    CONSTRAINT fk_stock_alerts_products FOREIGN KEY (product_id) REFERENCES products(id)
 );

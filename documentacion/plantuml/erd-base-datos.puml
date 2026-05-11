@@ -1,0 +1,101 @@
+@startuml
+title TecnoStore - Entidad relacion MySQL
+hide circle
+
+entity users {
+  * id : BIGINT
+  --
+  full_name : VARCHAR(120)
+  email : VARCHAR(150)
+  password : VARCHAR(120)
+  role : VARCHAR(20)
+  phone : VARCHAR(30)
+  active : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+entity categories {
+  * id : BIGINT
+  --
+  name : VARCHAR(80)
+  description : VARCHAR(250)
+}
+
+entity products {
+  * id : BIGINT
+  --
+  name : VARCHAR(140)
+  description : VARCHAR(500)
+  category_id : BIGINT
+  price : DECIMAL(12,2)
+  cost_price : DECIMAL(12,2)
+  stock : INT
+  image : VARCHAR(250)
+  active : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+entity orders {
+  * id : BIGINT
+  --
+  user_id : BIGINT
+  total : DECIMAL(12,2)
+  status : VARCHAR(30)
+  created_at : TIMESTAMP
+}
+
+entity order_items {
+  * id : BIGINT
+  --
+  order_id : BIGINT
+  product_id : BIGINT
+  quantity : INT
+  unit_price : DECIMAL(12,2)
+  subtotal : DECIMAL(12,2)
+}
+
+entity site_visits {
+  * id : BIGINT
+  --
+  session_id : VARCHAR(120)
+  visited_at : TIMESTAMP
+  source : VARCHAR(80)
+  page : VARCHAR(80)
+}
+
+entity carts {
+  * id : BIGINT
+  --
+  user_id : BIGINT
+  session_id : VARCHAR(120)
+  status : VARCHAR(30)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity performance_logs {
+  * id : BIGINT
+  --
+  page : VARCHAR(80)
+  load_time_ms : BIGINT
+  created_at : TIMESTAMP
+}
+
+entity stock_alerts {
+  * id : BIGINT
+  --
+  product_id : BIGINT
+  alert_type : VARCHAR(40)
+  stock_at_alert : INT
+  status : VARCHAR(30)
+  created_at : TIMESTAMP
+  attended_at : TIMESTAMP
+}
+
+users ||--o{ orders
+users ||--o{ carts
+categories ||--o{ products
+orders ||--|{ order_items
+products ||--o{ order_items
+products ||--o{ stock_alerts
+@enduml

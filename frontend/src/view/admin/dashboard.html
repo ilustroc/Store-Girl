@@ -1,34 +1,158 @@
 <section class="page-hero compact admin-hero">
     <div class="container">
-        <p class="eyebrow">Administrador</p>
-        <h1>Panel administrativo</h1>
-        <p>Gestiona el catalogo y revisa pedidos sin modulo de reportes.</p>
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-end">
+            <div>
+                <p class="eyebrow">Administrador</p>
+                <h1>Panel de Indicadores de Gestión</h1>
+                <p>Controla ventas, inventario, rentabilidad y experiencia de compra con datos claros.</p>
+            </div>
+            <div class="admin-toolbar">
+                <button class="btn btn-outline-light" id="dashboard-new-category">
+                    <i class="bi bi-tags me-2"></i>Agregar categoría
+                </button>
+                <button class="btn btn-warning" id="dashboard-new-product">
+                    <i class="bi bi-plus-circle me-2"></i>Agregar producto
+                </button>
+            </div>
+        </div>
     </div>
 </section>
 
-<section class="section-pad bg-white">
+<section class="section-pad bg-white executive-dashboard">
     <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <a class="admin-action-card" href="#/admin/productos">
+        <div class="dashboard-section">
+            <div class="dashboard-section-heading">
+                <div>
+                    <p class="eyebrow mb-1">Resumen general</p>
+                    <h2>Estado comercial de la tienda</h2>
+                </div>
+            </div>
+            <div class="admin-stat-grid">
+                <div class="admin-stat-card">
                     <i class="bi bi-box-seam"></i>
-                    <strong>Gestionar productos</strong>
-                    <span>Crear, editar y desactivar productos.</span>
-                </a>
-            </div>
-            <div class="col-lg-4">
-                <a class="admin-action-card" href="#/catalogo">
-                    <i class="bi bi-shop"></i>
-                    <strong>Ver tienda</strong>
-                    <span>Validar como se ve el catalogo publico.</span>
-                </a>
-            </div>
-            <div class="col-lg-4">
-                <a class="admin-action-card" href="#/mis-pedidos">
+                    <span>Total productos</span>
+                    <strong id="ind-summary-products">0</strong>
+                </div>
+                <div class="admin-stat-card">
+                    <i class="bi bi-tags"></i>
+                    <span>Categorías</span>
+                    <strong id="ind-summary-categories">0</strong>
+                </div>
+                <div class="admin-stat-card">
                     <i class="bi bi-receipt"></i>
-                    <strong>Pedidos propios</strong>
-                    <span>Consultar pedidos del usuario conectado.</span>
-                </a>
+                    <span>Pedidos</span>
+                    <strong id="ind-summary-orders">0</strong>
+                </div>
+                <div class="admin-stat-card">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Ventas acumuladas</span>
+                    <strong id="ind-summary-sales">S/0.00</strong>
+                </div>
+                <div class="admin-stat-card">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span>Stock bajo</span>
+                    <strong id="ind-summary-low-stock">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <div class="dashboard-section-heading">
+                <div>
+                    <p class="eyebrow mb-1">Inventario</p>
+                    <h2>Indicadores de inventario</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-xl-8">
+                    <div class="indicator-card">
+                        <div id="indicator-inventoryRotation"></div>
+                        <div class="chart-box"><canvas id="chart-inventory-rotation"></canvas></div>
+                        <div class="table-responsive mt-3">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Categoría</th>
+                                        <th>Vendidos</th>
+                                        <th>Stock promedio</th>
+                                        <th>Rotación</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-inventory-rotation"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="indicator-card h-100">
+                        <div id="indicator-minimumStockEffectiveness"></div>
+                        <div class="mini-metrics" id="stock-effectiveness-details"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <div class="dashboard-section-heading">
+                <div>
+                    <p class="eyebrow mb-1">Ventas</p>
+                    <h2>Indicadores comerciales</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-xl-7">
+                    <div class="indicator-card">
+                        <div id="indicator-dailySalesDensity"></div>
+                        <div class="chart-box"><canvas id="chart-daily-sales"></canvas></div>
+                        <div class="mini-metrics mt-3" id="daily-sales-details"></div>
+                    </div>
+                </div>
+                <div class="col-xl-5">
+                    <div class="indicator-card">
+                        <div id="indicator-confirmedOrdersRate"></div>
+                        <div class="chart-box compact-chart"><canvas id="chart-orders-status"></canvas></div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="indicator-card">
+                        <div id="indicator-profitabilityRanking"></div>
+                        <div class="chart-box"><canvas id="chart-profitability"></canvas></div>
+                        <div class="table-responsive mt-3">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Venta</th>
+                                        <th>Costo</th>
+                                        <th>Vendidos</th>
+                                        <th>Margen</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-profitability"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <div class="dashboard-section-heading">
+                <div>
+                    <p class="eyebrow mb-1">Experiencia</p>
+                    <h2>Indicadores de experiencia y rendimiento</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="indicator-card h-100" id="indicator-conversionRate"></div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="indicator-card h-100" id="indicator-cartAbandonmentRate"></div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="indicator-card h-100" id="indicator-catalogLoadTime"></div>
+                </div>
             </div>
         </div>
     </div>

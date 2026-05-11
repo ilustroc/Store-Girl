@@ -1,0 +1,21 @@
+@startuml
+title TecnoStore - Dashboard de indicadores de gestion
+
+actor Administrador
+participant "Frontend Dashboard" as Frontend
+participant AdminIndicatorController
+participant AdminIndicatorService
+participant Repositories
+database MySQL
+
+Administrador -> Frontend : entra a #/admin
+Frontend -> AdminIndicatorController : GET /admin/indicators
+AdminIndicatorController -> AdminIndicatorService : getIndicators()
+AdminIndicatorService -> Repositories : consultar ventas, inventario y analitica
+Repositories -> MySQL : SELECT orders, products, carts, visits, logs
+MySQL --> Repositories : datos operativos
+Repositories --> AdminIndicatorService : entidades y agregados
+AdminIndicatorService --> AdminIndicatorController : AdminIndicatorsResponse
+AdminIndicatorController --> Frontend : JSON de 8 indicadores
+Frontend --> Administrador : tarjetas, tablas y graficos
+@enduml

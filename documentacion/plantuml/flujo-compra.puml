@@ -1,0 +1,37 @@
+@startuml
+title TecnoStore - Flujo de compra
+
+actor Usuario
+participant Frontend
+participant OrderController
+participant OrderService
+participant ProductRepository
+participant OrderRepository
+database MySQL
+
+Usuario -> Frontend : agrega productos al carrito
+Frontend -> Frontend : calcula resumen local
+Usuario -> Frontend : confirma checkout
+Frontend -> OrderController : POST /orders
+OrderController -> OrderService : create(orderRequest)
+OrderService -> ProductRepository : buscar productos
+ProductRepository -> MySQL : SELECT products
+MySQL --> ProductRepository : productos
+ProductRepository --> OrderService : lista de productos
+
+alt stock insuficiente
+  OrderService --> OrderController : error claro
+  OrderController --> Frontend : 400 Stock insuficiente
+  Frontend --> Usuario : muestra mensaje
+else stock suficiente
+  OrderService -> ProductRepository : descontar stock
+  ProductRepository -> MySQL : UPDATE products
+  OrderService -> OrderRepository : guardar pedido
+  OrderRepository -> MySQL : INSERT orders / order_items
+  MySQL --> OrderRepository : pedido registrado
+  OrderRepository --> OrderService : pedido
+  OrderService --> OrderController : pedido confirmado
+  OrderController --> Frontend : 200 OK
+  Frontend --> Usuario : muestra confirmacion
+end
+@enduml
