@@ -76,24 +76,72 @@ const Router = (() => {
 
     async function mountOrders() {
         if (!Auth.requireAuth()) return;
-        const table = document.getElementById("orders-table");
-        table.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">Cargando pedidos...</td></tr>`;
+        const container = document.getElementById("orders-list");
+        if (!container) return;
+        container.innerHTML = `<div class="text-center text-muted py-4">Cargando pedidos...</div>`;
         try {
-            const orders = await Api.getOrdersByUser(Auth.session().id);
-            table.innerHTML = orders.length
-                ? orders.map(order => `
-                    <tr>
-                        <td>#${order.id}</td>
-                        <td>${StoreUtils.date(order.createdAt)}</td>
-                        <td>${order.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
-                        <td>${StoreUtils.money(order.total)}</td>
-                        <td><span class="badge text-bg-${StoreUtils.orderStatusClass(order.status)}">${order.status}</span></td>
-                    </tr>
-                `).join("")
-                : `<tr><td colspan="5" class="text-center text-muted py-4">Todavía no tienes pedidos.</td></tr>`;
+            const orders = await Api.getUserOrders(Auth.session().id);
+            container.innerHTML = orders.length
+                ? orders.map(orderCard).join("")
+                : StoreUtils.renderEmptyState({
+                    icon: "bi-bag",
+                    title: "Aún no tienes pedidos registrados",
+                    text: "Explora el catálogo y guarda aquí el historial de tus compras.",
+                    actionHref: "#/catalogo",
+                    actionText: "Explorar catálogo"
+                });
         } catch (error) {
-            table.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">${StoreUtils.escapeHtml(error.message)}</td></tr>`;
+            container.innerHTML = `<div class="alert alert-danger mb-0">${StoreUtils.escapeHtml(error.message)}</div>`;
         }
+    }
+
+    function orderCard(order) {
+        const items = Array.isArray(order.items) ? order.items : [];
+        const quantity = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+        const status = StoreUtils.escapeHtml(order.status || "PENDING");
+        return `
+            <article class="order-card">
+                <div class="order-card-head">
+                    <div>
+                        <span class="text-muted small">Pedido #${order.id}</span>
+                        <h3 class="h6 mb-1">${StoreUtils.date(order.createdAt)}</h3>
+                        <span class="text-muted small">${quantity} producto${quantity === 1 ? "" : "s"}</span>
+                    </div>
+                    <div class="text-lg-end">
+                        <span class="badge text-bg-${StoreUtils.orderStatusClass(order.status)}">${status}</span>
+                        <strong class="d-block mt-2">${StoreUtils.money(order.total || 0)}</strong>
+                    </div>
+                </div>
+                ${orderItemsTemplate(items)}
+            </article>
+        `;
+    }
+
+    function orderItemsTemplate(items) {
+        if (!items.length) {
+            return `<p class="text-muted mb-0 mt-3">Este pedido no incluye detalle de productos.</p>`;
+        }
+        return `
+            <div class="order-items">
+                ${items.map(item => {
+                    const product = item.product || {};
+                    const productName = product.name || item.productName || "Producto";
+                    const quantity = Number(item.quantity || 0);
+                    const unitPrice = Number(item.unitPrice ?? product.price ?? 0);
+                    const subtotal = Number(item.subtotal ?? unitPrice * quantity);
+                    return `
+                        <div class="order-item-line">
+                            <img src="${StoreUtils.productImage(product)}" alt="${StoreUtils.escapeHtml(productName)}" ${StoreUtils.imageFallbackAttr()}>
+                            <div>
+                                <strong>${StoreUtils.escapeHtml(productName)}</strong>
+                                <span>${quantity} x ${StoreUtils.money(unitPrice)}</span>
+                            </div>
+                            <strong>${StoreUtils.money(subtotal)}</strong>
+                        </div>
+                    `;
+                }).join("")}
+            </div>
+        `;
     }
 
     return { init, render };

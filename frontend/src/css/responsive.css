@@ -21,6 +21,10 @@
         grid-template-columns: 1fr;
     }
 
+    .benefit-grid {
+        grid-template-columns: 1fr;
+    }
+
     .admin-stat-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -88,6 +92,21 @@
 
     .cart-line > strong {
         grid-column: 2;
+    }
+
+    .checkout-line,
+    .order-item-line {
+        grid-template-columns: 48px 1fr;
+    }
+
+    .checkout-line > strong,
+    .order-item-line > strong {
+        grid-column: 2;
+    }
+
+    .order-card-head {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .image-upload-box {

@@ -67,6 +67,7 @@ const Api = (() => {
         getProducts: () => request("/products"),
         getAdminProducts: () => request("/products?includeInactive=true"),
         getProduct: id => request(`/products/${id}`),
+        getProductById: id => request(`/products/${id}`),
         getProductsByCategory: categoryId => request(`/products/category/${categoryId}`),
         createProduct: product => request("/products", { method: "POST", body: product }),
         updateProduct: (id, product) => request(`/products/${id}`, { method: "PUT", body: product }),
@@ -78,6 +79,7 @@ const Api = (() => {
         createOrder: order => request("/orders", { method: "POST", body: order }),
         getOrders: () => request("/orders"),
         getOrdersByUser: userId => request(`/orders/user/${userId}`),
+        getUserOrders: userId => request(`/orders/user/${userId}`),
         trackVisit: event => request("/analytics/visit", { method: "POST", body: event }),
         trackPerformance: event => request("/analytics/performance", { method: "POST", body: event }),
         trackCart: event => request("/analytics/cart", { method: "POST", body: event })

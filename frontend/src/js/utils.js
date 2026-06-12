@@ -82,6 +82,10 @@ const StoreUtils = (() => {
         return "assets/img/descarga.png";
     }
 
+    function getPlaceholderImage() {
+        return fallbackImage();
+    }
+
     function imageFallbackAttr() {
         return `onerror="this.onerror=null;this.src='${fallbackImage()}'"`;
     }
@@ -92,6 +96,17 @@ const StoreUtils = (() => {
             CONFIRMED: "success",
             CANCELLED: "danger"
         }[status] || "secondary";
+    }
+
+    function renderEmptyState({ icon = "bi-inbox", title = "No hay información", text = "", actionHref = "", actionText = "" } = {}) {
+        return `
+            <div class="empty-state">
+                <i class="bi ${escapeHtml(icon)}"></i>
+                <h2>${escapeHtml(title)}</h2>
+                ${text ? `<p>${escapeHtml(text)}</p>` : ""}
+                ${actionHref && actionText ? `<a class="btn btn-primary" href="${escapeHtml(actionHref)}">${escapeHtml(actionText)}</a>` : ""}
+            </div>
+        `;
     }
 
     function analyticsSessionId() {
@@ -116,8 +131,10 @@ const StoreUtils = (() => {
         showAlert,
         categoryName,
         productImage,
+        getPlaceholderImage,
         imageFallbackAttr,
         orderStatusClass,
+        renderEmptyState,
         analyticsSessionId
     };
 })();

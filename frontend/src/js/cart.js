@@ -1,35 +1,36 @@
 const Cart = (() => {
-    const key = "tecnostore.cart";
+    const storageKey = "tecnostore.cart";
     let items = [];
 
     function init() {
-        items = load();
+        items = getCart();
         renderBadge();
     }
 
-    function load() {
+    function getCart() {
         try {
-            return JSON.parse(localStorage.getItem(key)) || [];
+            return JSON.parse(localStorage.getItem(storageKey)) || [];
         } catch {
             return [];
         }
     }
 
-    function save(status = items.length ? "ACTIVE" : "ABANDONED") {
-        localStorage.setItem(key, JSON.stringify(items));
+    function saveCart(status = items.length ? "ACTIVE" : "ABANDONED") {
+        localStorage.setItem(storageKey, JSON.stringify(items));
         renderBadge();
         trackCart(status);
     }
 
-    function add(product) {
-        if (!product || product.stock <= 0) {
-            StoreUtils.toast("Producto sin stock disponible", "warning");
+    function addToCart(product) {
+        if (!product || Number(product.stock) <= 0) {
+            StoreUtils.showToast("Producto sin stock disponible", "warning");
             return;
         }
+
         const existing = items.find(item => Number(item.productId) === Number(product.id));
         if (existing) {
-            if (existing.quantity >= product.stock) {
-                StoreUtils.toast("Stock maximo alcanzado", "warning");
+            if (existing.quantity >= Number(product.stock)) {
+                StoreUtils.showToast("Stock máximo alcanzado", "warning");
                 return;
             }
             existing.quantity += 1;
@@ -43,111 +44,131 @@ const Cart = (() => {
                 quantity: 1
             });
         }
-        save();
-        StoreUtils.toast("Producto agregado al carrito", "success");
+
+        saveCart();
+        StoreUtils.showToast("Producto agregado al carrito", "success");
     }
 
-    function change(productId, delta) {
-        const item = items.find(entry => Number(entry.productId) === Number(productId));
-        if (!item) return;
-        const next = item.quantity + delta;
-        if (next <= 0) {
-            remove(productId);
-            return;
-        }
-        if (next > item.stock) {
-            StoreUtils.toast("No hay mas stock para este producto", "warning");
-            return;
-        }
-        item.quantity = next;
-        save();
-        renderCartPage();
+    function removeFromCart(productId) {
+        items = items.filter(item => Number(item.productId) !== Number(productId));
+        saveCart();
+        renderCart();
         renderCheckout();
     }
 
-    function remove(productId) {
-        items = items.filter(item => Number(item.productId) !== Number(productId));
-        save();
-        renderCartPage();
+    function updateQuantity(productId, delta) {
+        const item = items.find(entry => Number(entry.productId) === Number(productId));
+        if (!item) return;
+
+        const nextQuantity = item.quantity + delta;
+        if (nextQuantity <= 0) {
+            removeFromCart(productId);
+            return;
+        }
+
+        if (nextQuantity > Number(item.stock)) {
+            StoreUtils.showToast("No hay más stock para este producto", "warning");
+            return;
+        }
+
+        item.quantity = nextQuantity;
+        saveCart();
+        renderCart();
         renderCheckout();
     }
 
     function clear(status = "ABANDONED") {
         items = [];
-        save(status);
+        saveCart(status);
     }
 
-    function total() {
-        return items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+    function calculateCartTotal() {
+        return items.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
+    }
+
+    function calculateItemCount() {
+        return items.reduce((sum, item) => sum + Number(item.quantity), 0);
     }
 
     function renderBadge() {
-        const count = items.reduce((sum, item) => sum + item.quantity, 0);
         const badge = document.getElementById("cart-count");
-        if (badge) badge.textContent = count;
-    }
-
-    function rowTemplate(item) {
-        return `
-            <div class="cart-line">
-                <img src="${StoreUtils.escapeHtml(item.image)}" alt="${StoreUtils.escapeHtml(item.name)}" ${StoreUtils.imageFallbackAttr()}>
-                <div>
-                    <strong>${StoreUtils.escapeHtml(item.name)}</strong>
-                    <div class="text-muted small">${StoreUtils.money(item.price)}</div>
-                    <div class="cart-line-actions">
-                        <div class="quantity-control">
-                            <button type="button" data-cart-minus="${item.productId}">-</button>
-                            <span>${item.quantity}</span>
-                            <button type="button" data-cart-plus="${item.productId}">+</button>
-                        </div>
-                        <button class="btn btn-sm btn-link text-danger" data-cart-remove="${item.productId}">Eliminar</button>
-                    </div>
-                </div>
-                <strong>${StoreUtils.money(Number(item.price) * item.quantity)}</strong>
-            </div>
-        `;
+        if (badge) badge.textContent = calculateItemCount();
     }
 
     function renderCartPage() {
+        renderCart();
+    }
+
+    function renderCart() {
         const list = document.getElementById("cart-page-items");
         if (!list) return;
-        if (!items.length) {
-            list.innerHTML = `<div class="empty-state"><i class="bi bi-cart-x"></i><h2>Tu carrito esta vacio</h2><p>Agrega productos desde el catalogo.</p><a class="btn btn-primary" href="#/catalogo">Ir al catalogo</a></div>`;
-        } else {
-            list.innerHTML = items.map(rowTemplate).join("");
-        }
-        const subtotal = document.getElementById("cart-page-subtotal");
-        const pageTotal = document.getElementById("cart-page-total");
-        if (subtotal) subtotal.textContent = StoreUtils.money(total());
-        if (pageTotal) pageTotal.textContent = StoreUtils.money(total());
+
+        list.innerHTML = items.length
+            ? items.map(cartRowTemplate).join("")
+            : StoreUtils.renderEmptyState({
+                icon: "bi-cart-x",
+                title: "Tu carrito está vacío",
+                text: "Agrega productos desde el catálogo y vuelve para revisar tu compra.",
+                actionHref: "#/catalogo",
+                actionText: "Ver catálogo"
+            });
+
+        updateCartSummary();
         bindCartButtons();
+    }
+
+    function updateCartSummary() {
+        setText("cart-page-count", `${calculateItemCount()} producto${calculateItemCount() === 1 ? "" : "s"}`);
+        setText("cart-page-subtotal", StoreUtils.formatCurrency(calculateCartTotal()));
+        setText("cart-page-total", StoreUtils.formatCurrency(calculateCartTotal()));
+        const checkoutLink = document.getElementById("cart-checkout-link");
+        if (checkoutLink) checkoutLink.classList.toggle("disabled", !items.length);
     }
 
     function renderCheckout() {
         const list = document.getElementById("checkout-items");
         if (!list) return;
-        list.innerHTML = items.length ? items.map(rowTemplate).join("") : `<div class="empty-state compact"><p>No hay productos para confirmar.</p><a class="btn btn-primary" href="#/catalogo">Comprar productos</a></div>`;
-        const user = Auth.session();
-        const userBox = document.getElementById("checkout-user");
-        if (userBox) {
-            userBox.innerHTML = user
-                ? `<div class="checkout-user"><strong>${StoreUtils.escapeHtml(user.fullName)}</strong><span>${StoreUtils.escapeHtml(user.email)}</span></div>`
-                : `<div class="alert alert-warning">Debes iniciar sesión para confirmar la compra.</div>`;
-        }
-        const checkoutTotal = document.getElementById("checkout-total");
-        if (checkoutTotal) checkoutTotal.textContent = StoreUtils.money(total());
+
+        list.innerHTML = items.length
+            ? items.map(checkoutRowTemplate).join("")
+            : StoreUtils.renderEmptyState({
+                icon: "bi-bag-x",
+                title: "No hay productos para confirmar",
+                text: "Tu carrito está vacío. Agrega productos antes de continuar.",
+                actionHref: "#/catalogo",
+                actionText: "Comprar productos"
+            });
+
+        renderCheckoutUser();
+        setText("checkout-total", StoreUtils.formatCurrency(calculateCartTotal()));
         bindCartButtons();
         document.getElementById("btn-confirm-order")?.addEventListener("click", confirmOrder);
+    }
+
+    function renderCheckoutUser() {
+        const user = Auth.session();
+        const userBox = document.getElementById("checkout-user");
+        if (!userBox) return;
+        userBox.innerHTML = user
+            ? `<div class="checkout-user"><strong>${StoreUtils.escapeHtml(user.fullName)}</strong><span>${StoreUtils.escapeHtml(user.email)}</span></div>`
+            : `<div class="alert alert-warning">Debes iniciar sesión para confirmar la compra.</div>`;
+        const nameInput = document.getElementById("checkout-name");
+        if (nameInput && user?.fullName && !nameInput.value) nameInput.value = user.fullName;
     }
 
     async function confirmOrder() {
         if (!Auth.requireAuth()) return;
         if (!items.length) {
-            StoreUtils.toast("El carrito esta vacio", "warning");
+            StoreUtils.showAlert("#checkout-alert", "El carrito está vacío.", "warning");
             return;
         }
+
+        const form = document.getElementById("checkout-form");
+        const data = getCheckoutFormData(form);
+        if (!validateCheckout(data)) return;
+
         const button = document.getElementById("btn-confirm-order");
-        button.disabled = true;
+        setButtonLoading(button, true);
         try {
             await Api.createOrder({
                 userId: Auth.session().id,
@@ -155,19 +176,75 @@ const Cart = (() => {
             });
             clear("COMPLETED");
             await Store.refresh();
-            StoreUtils.toast("Pedido confirmado correctamente", "success");
+            StoreUtils.showToast("Pedido confirmado correctamente", "success");
             location.hash = "#/mis-pedidos";
         } catch (error) {
-            StoreUtils.toast(error.message, "danger");
+            StoreUtils.showAlert("#checkout-alert", error.message || "No se pudo confirmar el pedido.", "danger");
         } finally {
-            button.disabled = false;
+            setButtonLoading(button, false);
         }
     }
 
+    function getCheckoutFormData(form) {
+        if (!form) return {};
+        return {
+            fullName: document.getElementById("checkout-name").value.trim(),
+            phone: document.getElementById("checkout-phone").value.trim(),
+            address: document.getElementById("checkout-address").value.trim(),
+            comment: document.getElementById("checkout-comment").value.trim()
+        };
+    }
+
+    function validateCheckout(data) {
+        const errors = {
+            "checkout-name": !data.fullName,
+            "checkout-phone": !data.phone,
+            "checkout-address": !data.address
+        };
+        Object.entries(errors).forEach(([id, invalid]) => document.getElementById(id)?.classList.toggle("is-invalid", invalid));
+        const hasErrors = Object.values(errors).some(Boolean);
+        StoreUtils.showAlert("#checkout-alert", hasErrors ? "Completa nombre, teléfono y dirección para confirmar tu pedido." : "", "warning");
+        return !hasErrors;
+    }
+
+    function cartRowTemplate(item) {
+        return `
+            <div class="cart-line">
+                <img src="${StoreUtils.escapeHtml(item.image)}" alt="${StoreUtils.escapeHtml(item.name)}" ${StoreUtils.imageFallbackAttr()}>
+                <div>
+                    <strong>${StoreUtils.escapeHtml(item.name)}</strong>
+                    <div class="text-muted small">Precio unitario: ${StoreUtils.formatCurrency(item.price)}</div>
+                    <div class="cart-line-actions">
+                        <div class="quantity-control" aria-label="Cantidad">
+                            <button type="button" data-cart-minus="${item.productId}" aria-label="Disminuir cantidad">-</button>
+                            <span>${item.quantity}</span>
+                            <button type="button" data-cart-plus="${item.productId}" aria-label="Aumentar cantidad">+</button>
+                        </div>
+                        <button class="btn btn-sm btn-link text-danger" data-cart-remove="${item.productId}">Eliminar</button>
+                    </div>
+                </div>
+                <strong>${StoreUtils.formatCurrency(Number(item.price) * Number(item.quantity))}</strong>
+            </div>
+        `;
+    }
+
+    function checkoutRowTemplate(item) {
+        return `
+            <div class="checkout-line">
+                <img src="${StoreUtils.escapeHtml(item.image)}" alt="${StoreUtils.escapeHtml(item.name)}" ${StoreUtils.imageFallbackAttr()}>
+                <div>
+                    <strong>${StoreUtils.escapeHtml(item.name)}</strong>
+                    <span>${item.quantity} x ${StoreUtils.formatCurrency(item.price)}</span>
+                </div>
+                <strong>${StoreUtils.formatCurrency(Number(item.price) * Number(item.quantity))}</strong>
+            </div>
+        `;
+    }
+
     function bindCartButtons() {
-        document.querySelectorAll("[data-cart-minus]").forEach(button => button.onclick = () => change(button.dataset.cartMinus, -1));
-        document.querySelectorAll("[data-cart-plus]").forEach(button => button.onclick = () => change(button.dataset.cartPlus, 1));
-        document.querySelectorAll("[data-cart-remove]").forEach(button => button.onclick = () => remove(button.dataset.cartRemove));
+        document.querySelectorAll("[data-cart-minus]").forEach(button => button.onclick = () => updateQuantity(button.dataset.cartMinus, -1));
+        document.querySelectorAll("[data-cart-plus]").forEach(button => button.onclick = () => updateQuantity(button.dataset.cartPlus, 1));
+        document.querySelectorAll("[data-cart-remove]").forEach(button => button.onclick = () => removeFromCart(button.dataset.cartRemove));
     }
 
     function trackCart(status) {
@@ -178,5 +255,34 @@ const Cart = (() => {
         }).catch(() => {});
     }
 
-    return { init, add, renderCartPage, renderCheckout, clear, total };
+    function setText(id, value) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    }
+
+    function setButtonLoading(button, loading) {
+        if (!button) return;
+        button.disabled = loading;
+        button.dataset.originalText ||= button.innerHTML;
+        button.innerHTML = loading
+            ? `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Confirmando...`
+            : button.dataset.originalText;
+    }
+
+    return {
+        init,
+        getCart,
+        saveCart,
+        add: addToCart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        renderCartPage,
+        renderCart,
+        renderCheckout,
+        confirmOrder,
+        clear,
+        total: calculateCartTotal,
+        calculateCartTotal
+    };
 })();

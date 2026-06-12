@@ -11,7 +11,7 @@
         <div class="row g-4">
             <div class="col-lg-7">
                 <div class="surface-card">
-                    <h2>Productos</h2>
+                    <h2>Resumen del pedido</h2>
                     <div id="checkout-items"></div>
                 </div>
             </div>
@@ -19,6 +19,28 @@
                 <div class="surface-card">
                     <h2>Datos de compra</h2>
                     <div id="checkout-user"></div>
+                    <div class="alert d-none mt-3" id="checkout-alert" role="alert"></div>
+                    <form id="checkout-form" class="checkout-form mt-3" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label" for="checkout-name">Nombre completo</label>
+                            <input class="form-control" id="checkout-name" type="text" required>
+                            <div class="invalid-feedback">Ingresa tu nombre completo.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="checkout-phone">Teléfono</label>
+                            <input class="form-control" id="checkout-phone" type="tel" required>
+                            <div class="invalid-feedback">Ingresa un teléfono de contacto.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="checkout-address">Dirección o referencia</label>
+                            <textarea class="form-control" id="checkout-address" rows="3" required></textarea>
+                            <div class="invalid-feedback">Ingresa una dirección o referencia.</div>
+                        </div>
+                        <div>
+                            <label class="form-label" for="checkout-comment">Comentario opcional</label>
+                            <textarea class="form-control" id="checkout-comment" rows="2"></textarea>
+                        </div>
+                    </form>
                     <div class="summary-row total mt-3">
                         <span>Total</span>
                         <strong id="checkout-total">S/0.00</strong>
