@@ -11,13 +11,14 @@
             <form id="product-form">
                 <div class="modal-body">
                     <input type="hidden" id="product-id">
+                    <div class="alert d-none" id="product-alert" role="alert"></div>
                     <div class="row g-3">
                         <div class="col-md-7">
                             <label class="form-label" for="product-name">Nombre</label>
                             <input class="form-control" id="product-name" type="text" required>
                         </div>
                         <div class="col-md-5">
-                            <label class="form-label" for="product-category">Categoria</label>
+                            <label class="form-label" for="product-category">Categoría</label>
                             <select class="form-select" id="product-category" required></select>
                         </div>
                         <div class="col-md-4">
@@ -51,7 +52,7 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <label class="form-label" for="product-description">Descripcion</label>
+                            <label class="form-label" for="product-description">Descripción</label>
                             <textarea class="form-control" id="product-description" rows="4" required></textarea>
                         </div>
                     </div>
@@ -71,7 +72,7 @@
             <div class="modal-header">
                 <div>
                     <p class="eyebrow mb-1">Administrador</p>
-                    <h5 class="modal-title" id="categoryModalLabel">Categoria</h5>
+                    <h5 class="modal-title" id="categoryModalLabel">Categoría</h5>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -83,7 +84,7 @@
                         <input class="form-control" id="category-name" type="text" maxlength="80" required>
                     </div>
                     <div>
-                        <label class="form-label" for="category-description">Descripcion</label>
+                        <label class="form-label" for="category-description">Descripción</label>
                         <textarea class="form-control" id="category-description" rows="3" maxlength="250"></textarea>
                     </div>
                     <div class="alert alert-warning mt-3 mb-0 d-none" id="category-alert"></div>

@@ -1,5 +1,5 @@
 const Api = (() => {
-    const baseUrl = localStorage.getItem("tecnostore.apiUrl") || "http://localhost:8080/api";
+    const API_BASE_URL = localStorage.getItem("tecnostore.apiUrl") || "http://localhost:8080/api";
 
     function currentSession() {
         try {
@@ -14,14 +14,13 @@ const Api = (() => {
         const headers = { "Content-Type": "application/json" };
         if (session?.role) headers["X-User-Role"] = session.role;
 
-        const response = await fetch(`${baseUrl}${path}`, {
+        const response = await fetch(`${API_BASE_URL}${path}`, {
             method: options.method || "GET",
             headers,
             body: options.body ? JSON.stringify(options.body) : undefined
         });
 
-        const text = await response.text();
-        const data = text ? JSON.parse(text) : null;
+        const data = await parseResponse(response);
         if (!response.ok) {
             throw new Error(data?.message || data?.error || "No se pudo completar la solicitud");
         }
@@ -36,18 +35,27 @@ const Api = (() => {
         const formData = new FormData();
         formData.append("file", file);
 
-        const response = await fetch(`${baseUrl}${path}`, {
+        const response = await fetch(`${API_BASE_URL}${path}`, {
             method: "POST",
             headers,
             body: formData
         });
 
-        const text = await response.text();
-        const data = text ? JSON.parse(text) : null;
+        const data = await parseResponse(response);
         if (!response.ok) {
             throw new Error(data?.message || data?.error || "No se pudo completar la solicitud");
         }
         return data;
+    }
+
+    async function parseResponse(response) {
+        const text = await response.text();
+        if (!text) return null;
+        try {
+            return JSON.parse(text);
+        } catch {
+            return { message: text };
+        }
     }
 
     return {
@@ -57,10 +65,12 @@ const Api = (() => {
         getAdminDashboard: () => request("/admin/dashboard"),
         getAdminIndicators: () => request("/admin/indicators"),
         getProducts: () => request("/products"),
+        getAdminProducts: () => request("/products?includeInactive=true"),
         getProduct: id => request(`/products/${id}`),
         getProductsByCategory: categoryId => request(`/products/category/${categoryId}`),
         createProduct: product => request("/products", { method: "POST", body: product }),
         updateProduct: (id, product) => request(`/products/${id}`, { method: "PUT", body: product }),
+        updateProductStatus: (id, active) => request(`/products/${id}/status`, { method: "PUT", body: { active } }),
         deleteProduct: id => request(`/products/${id}`, { method: "DELETE" }),
         uploadProductImage: file => upload("/uploads/product-image", file),
         login: credentials => request("/auth/login", { method: "POST", body: credentials }),

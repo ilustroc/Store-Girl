@@ -20,8 +20,10 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Product> findAll() {
-        return productRepository.findByActiveTrueOrderByIdDesc();
+    public List<Product> findAll(boolean includeInactive) {
+        return includeInactive
+                ? productRepository.findAllByOrderByIdDesc()
+                : productRepository.findByActiveTrueOrderByIdDesc();
     }
 
     public Product findById(Long id) {
@@ -42,20 +44,31 @@ public class ProductService {
     }
 
     public Product update(Long id, ProductRequest request) {
-        Product product = findById(id);
+        Product product = findExisting(id);
         fillProduct(product, request);
         return productRepository.save(product);
     }
 
     public void delete(Long id) {
-        Product product = findById(id);
+        Product product = findExisting(id);
         product.setActive(false);
         productRepository.save(product);
     }
 
+    public Product updateStatus(Long id, boolean active) {
+        Product product = findExisting(id);
+        product.setActive(active);
+        return productRepository.save(product);
+    }
+
+    private Product findExisting(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+    }
+
     private void fillProduct(Product product, ProductRequest request) {
         Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada"));
+                .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
         product.setName(request.name());
         product.setDescription(request.description());
         product.setCategory(category);

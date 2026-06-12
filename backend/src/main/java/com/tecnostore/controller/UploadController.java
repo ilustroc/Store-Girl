@@ -2,11 +2,7 @@ package com.tecnostore.controller;
 
 import com.tecnostore.model.Role;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -49,7 +45,7 @@ public class UploadController {
 
     private void validateImage(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("Selecciona una imagen valida");
+            throw new IllegalArgumentException("Selecciona una imagen válida");
         }
         if (file.getSize() > MAX_IMAGE_SIZE) {
             throw new IllegalArgumentException("La imagen no debe superar 5MB");
@@ -113,7 +109,7 @@ public class UploadController {
 
     private void requireAdmin(String role) {
         if (!Role.ADMIN.name().equalsIgnoreCase(role)) {
-            throw new SecurityException("Solo el administrador puede subir imagenes");
+            throw new SecurityException("Solo el administrador puede subir imágenes");
         }
     }
 }

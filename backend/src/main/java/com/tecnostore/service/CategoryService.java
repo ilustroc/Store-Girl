@@ -22,7 +22,7 @@ public class CategoryService {
     public Category create(CategoryRequest request) {
         String name = normalizeName(request.name());
         if (categoryRepository.existsByNameIgnoreCase(name)) {
-            throw new IllegalArgumentException("Ya existe una categoria con ese nombre");
+            throw new IllegalArgumentException("Ya existe una categoría con ese nombre");
         }
 
         Category category = new Category();
@@ -33,10 +33,10 @@ public class CategoryService {
 
     public Category update(Long id, CategoryRequest request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada"));
+                .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
         String name = normalizeName(request.name());
         if (categoryRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
-            throw new IllegalArgumentException("Ya existe una categoria con ese nombre");
+            throw new IllegalArgumentException("Ya existe una categoría con ese nombre");
         }
 
         category.setName(name);

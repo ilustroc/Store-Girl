@@ -8,12 +8,24 @@ const StoreUtils = (() => {
         return moneyFormatter.format(Number(value || 0));
     }
 
+    function formatCurrency(value) {
+        return money(value);
+    }
+
+    function formatNumber(value) {
+        return new Intl.NumberFormat("es-PE").format(Number(value || 0));
+    }
+
     function date(value) {
         if (!value) return "-";
         return new Intl.DateTimeFormat("es-PE", {
             dateStyle: "medium",
             timeStyle: "short"
         }).format(new Date(value));
+    }
+
+    function formatDate(value) {
+        return date(value);
     }
 
     function escapeHtml(value) {
@@ -27,6 +39,7 @@ const StoreUtils = (() => {
 
     function toast(message, type = "primary") {
         const container = document.getElementById("toast-container");
+        if (!container) return;
         const id = `toast-${Date.now()}`;
         container.insertAdjacentHTML("beforeend", `
             <div id="${id}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -39,6 +52,19 @@ const StoreUtils = (() => {
         const element = document.getElementById(id);
         bootstrap.Toast.getOrCreateInstance(element, { delay: 3200 }).show();
         element.addEventListener("hidden.bs.toast", () => element.remove());
+    }
+
+    function showToast(message, type = "primary") {
+        toast(message, type);
+    }
+
+    function showAlert(container, message, type = "danger") {
+        const element = typeof container === "string" ? document.querySelector(container) : container;
+        if (!element) return;
+        ["success", "danger", "warning", "info", "primary", "secondary"].forEach(item => element.classList.remove(`alert-${item}`));
+        element.classList.add("alert", `alert-${type}`);
+        element.classList.toggle("d-none", !message);
+        element.textContent = message || "";
     }
 
     function categoryName(product) {
@@ -78,5 +104,20 @@ const StoreUtils = (() => {
         return id;
     }
 
-    return { money, date, escapeHtml, toast, categoryName, productImage, imageFallbackAttr, orderStatusClass, analyticsSessionId };
+    return {
+        money,
+        formatCurrency,
+        formatNumber,
+        date,
+        formatDate,
+        escapeHtml,
+        toast,
+        showToast,
+        showAlert,
+        categoryName,
+        productImage,
+        imageFallbackAttr,
+        orderStatusClass,
+        analyticsSessionId
+    };
 })();

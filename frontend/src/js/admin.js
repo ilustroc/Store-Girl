@@ -1,38 +1,35 @@
 const Admin = (() => {
+    const LOW_STOCK_LIMIT = 5;
     let productModal;
     let categoryModal;
     let currentProductId = null;
     let currentCategoryId = null;
     let imageUploading = false;
+    let adminProducts = [];
+    let adminCategories = [];
     let indicatorCharts = [];
 
     function init() {
-        productModal = new bootstrap.Modal(document.getElementById("productModal"));
-        categoryModal = new bootstrap.Modal(document.getElementById("categoryModal"));
+        productModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("productModal"));
+        categoryModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("categoryModal"));
         document.getElementById("product-form")?.addEventListener("submit", saveProduct);
         document.getElementById("category-form")?.addEventListener("submit", saveCategory);
-        document.getElementById("product-image-file")?.addEventListener("change", handleProductImageSelected);
+        document.getElementById("product-image-file")?.addEventListener("change", event => handleProductImageUpload(event.target.files?.[0]));
     }
 
     async function mountDashboard() {
+        if (!Auth.requireAdmin()) return;
         Auth.refreshUi();
-        await Store.refresh();
+        adminCategories = Store.categories();
         bindDashboardButtons();
-        try {
-            const indicators = await Api.getAdminIndicators();
-            renderIndicators(indicators);
-        } catch (error) {
-            StoreUtils.toast(error.message, "danger");
-            renderIndicators(null);
-        }
+        await loadIndicatorsDashboard();
     }
 
     async function mountProducts() {
         if (!Auth.requireAdmin()) return;
-        await Store.refresh();
         bindAdminButtons();
-        renderCategories();
-        renderProducts();
+        await loadCategories();
+        await loadProducts();
     }
 
     function bindAdminButtons() {
@@ -45,247 +42,103 @@ const Admin = (() => {
     }
 
     function bindDashboardButtons() {
-        ["dashboard-new-product"].forEach(id => {
-            document.getElementById(id)?.addEventListener("click", () => openProductModal());
-        });
-        ["dashboard-new-category"].forEach(id => {
-            document.getElementById(id)?.addEventListener("click", () => openCategoryModal());
-        });
+        document.getElementById("dashboard-new-product")?.addEventListener("click", () => openProductModal());
+        document.getElementById("dashboard-new-category")?.addEventListener("click", () => openCategoryModal());
     }
 
-    function renderIndicators(payload) {
-        destroyCharts();
-        const data = payload || emptyIndicators();
-        setText("ind-summary-products", data.summary.totalProducts);
-        setText("ind-summary-categories", data.summary.totalCategories);
-        setText("ind-summary-orders", data.summary.totalOrders);
-        setText("ind-summary-sales", StoreUtils.money(data.summary.accumulatedSales));
-        setText("ind-summary-low-stock", data.summary.lowStockProducts);
-
-        renderIndicatorBlock("indicator-inventoryRotation", data.inventoryRotation);
-        renderInventoryRotation(data.inventoryRotation);
-        renderIndicatorBlock("indicator-minimumStockEffectiveness", data.minimumStockEffectiveness);
-        renderStockEffectiveness(data.minimumStockEffectiveness);
-
-        renderIndicatorBlock("indicator-dailySalesDensity", data.dailySalesDensity);
-        renderDailySales(data.dailySalesDensity);
-        renderIndicatorBlock("indicator-profitabilityRanking", data.profitabilityRanking);
-        renderProfitability(data.profitabilityRanking);
-        renderIndicatorBlock("indicator-confirmedOrdersRate", data.confirmedOrdersRate);
-        renderOrdersStatus(data.confirmedOrdersRate);
-
-        renderIndicatorBlock("indicator-conversionRate", data.conversionRate);
-        renderIndicatorBlock("indicator-cartAbandonmentRate", data.cartAbandonmentRate);
-        renderIndicatorBlock("indicator-catalogLoadTime", data.catalogLoadTime);
+    async function loadProducts(showLoading = true) {
+        const table = document.getElementById("admin-products-table");
+        if (showLoading && table) {
+            table.innerHTML = emptyRow(7, "Cargando productos...");
+        }
+        try {
+            adminProducts = await Api.getAdminProducts();
+            renderProductsTable(adminProducts);
+        } catch (error) {
+            if (table) table.innerHTML = emptyRow(7, "No se pudieron cargar los productos.");
+            StoreUtils.showToast(error.message, "danger");
+        }
     }
 
-    function renderIndicatorBlock(id, indicator) {
-        const element = document.getElementById(id);
-        if (!element || !indicator) return;
-        element.innerHTML = `
-            <div class="indicator-heading">
-                <div>
-                    <h3>${StoreUtils.escapeHtml(indicator.title)}</h3>
-                    <p>${StoreUtils.escapeHtml(indicator.description)}</p>
-                </div>
-                <span class="indicator-status ${statusClass(indicator.status)}">${statusLabel(indicator.status)}</span>
-            </div>
-            <div class="indicator-value">${StoreUtils.escapeHtml(indicator.valueLabel || "Sin datos")}</div>
-            ${indicator.message ? `<div class="indicator-message">${StoreUtils.escapeHtml(indicator.message)}</div>` : ""}
-            <div class="indicator-meta">
-                <div><span>Fórmula</span><strong>${StoreUtils.escapeHtml(indicator.formula)}</strong></div>
-                <div><span>Frecuencia</span><strong>${StoreUtils.escapeHtml(indicator.frequency)}</strong></div>
-                <div><span>Meta</span><strong>${StoreUtils.escapeHtml(indicator.goal)}</strong></div>
-            </div>
-        `;
+    async function loadCategories() {
+        try {
+            adminCategories = await Api.getCategories();
+            renderCategoryOptions(adminCategories);
+            renderCategories(adminCategories);
+            updateDashboardCategoryCounter();
+        } catch (error) {
+            StoreUtils.showToast(error.message, "danger");
+        }
     }
 
-    function renderInventoryRotation(indicator) {
-        const rows = Array.isArray(indicator?.data) ? indicator.data : [];
-        const table = document.getElementById("table-inventory-rotation");
-        table.innerHTML = rows.length ? rows.map(row => `
-            <tr>
-                <td>${StoreUtils.escapeHtml(row.category)}</td>
-                <td>${row.unitsSold}</td>
-                <td>${formatDecimal(row.averageStock)}</td>
-                <td>${formatDecimal(row.rotation)}x</td>
+    function renderProductsTable(products) {
+        const table = document.getElementById("admin-products-table");
+        if (!table) return;
+        table.innerHTML = products.length
+            ? products.map(productRowTemplate).join("")
+            : emptyRow(7, "No hay productos registrados.");
+        bindProductActions();
+    }
+
+    function productRowTemplate(product) {
+        const stock = stockState(product.stock);
+        const active = product.active !== false;
+        return `
+            <tr class="${active ? "" : "table-light"}">
+                <td>
+                    <div class="table-product admin-product-cell">
+                        <img src="${StoreUtils.escapeHtml(StoreUtils.productImage(product))}" alt="${StoreUtils.escapeHtml(product.name)}" ${StoreUtils.imageFallbackAttr()}>
+                        <div>
+                            <strong>${StoreUtils.escapeHtml(product.name)}</strong>
+                            <span>${StoreUtils.escapeHtml(product.description || "").slice(0, 88)}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>${StoreUtils.escapeHtml(StoreUtils.categoryName(product))}</td>
+                <td>${StoreUtils.formatCurrency(product.price)}</td>
+                <td>${StoreUtils.formatCurrency(product.costPrice || 0)}</td>
+                <td><span class="stock-state ${stock.className}">${stock.label}</span></td>
+                <td><span class="status-pill ${active ? "active" : "inactive"}">${active ? "Activo" : "Inactivo"}</span></td>
+                <td class="text-end">
+                    <div class="admin-row-actions">
+                        <button class="btn btn-sm btn-outline-primary" data-admin-edit="${product.id}" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" data-admin-image="${product.id}" title="Cambiar imagen">
+                            <i class="bi bi-image"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" data-admin-toggle="${product.id}" title="${active ? "Desactivar" : "Activar"}">
+                            <i class="bi ${active ? "bi-eye-slash" : "bi-eye"}"></i>
+                        </button>
+                    </div>
+                </td>
             </tr>
-        `).join("") : emptyRow(4);
-        renderChart("chart-inventory-rotation", {
-            type: "bar",
-            data: {
-                labels: rows.map(row => row.category),
-                datasets: [{ label: "Rotación", data: rows.map(row => Number(row.rotation || 0)), backgroundColor: "#0D0000" }]
-            },
-            options: baseChartOptions()
-        });
-    }
-
-    function renderDailySales(indicator) {
-        const series = Array.isArray(indicator?.data?.series) ? indicator.data.series : [];
-        const details = document.getElementById("daily-sales-details");
-        details.innerHTML = `
-            <div><span>Día con mayor ingreso</span><strong>${StoreUtils.escapeHtml(indicator?.data?.bestDay || "Sin datos")}</strong></div>
-            <div><span>Total acumulado</span><strong>${StoreUtils.money(indicator?.data?.total || 0)}</strong></div>
-        `;
-        renderChart("chart-daily-sales", {
-            type: "line",
-            data: {
-                labels: series.map(row => row.date),
-                datasets: [{
-                    label: "Ingresos diarios",
-                    data: series.map(row => Number(row.revenue || 0)),
-                    borderColor: "#0D0000",
-                    backgroundColor: "rgba(13, 0, 0, 0.12)",
-                    tension: 0.32,
-                    fill: true
-                }]
-            },
-            options: baseChartOptions()
-        });
-    }
-
-    function renderProfitability(indicator) {
-        const rows = Array.isArray(indicator?.data) ? indicator.data : [];
-        const table = document.getElementById("table-profitability");
-        table.innerHTML = rows.length ? rows.map(row => `
-            <tr>
-                <td>${StoreUtils.escapeHtml(row.product)}</td>
-                <td>${StoreUtils.money(row.salePrice)}</td>
-                <td>${row.costRegistered ? StoreUtils.money(row.costPrice) : "Costo no registrado"}</td>
-                <td>${row.unitsSold}</td>
-                <td>${StoreUtils.money(row.margin)}</td>
-            </tr>
-        `).join("") : emptyRow(5);
-        renderChart("chart-profitability", {
-            type: "bar",
-            data: {
-                labels: rows.map(row => row.product),
-                datasets: [{ label: "Margen", data: rows.map(row => Number(row.margin || 0)), backgroundColor: "#6B6B6B" }]
-            },
-            options: baseChartOptions("y")
-        });
-    }
-
-    function renderOrdersStatus(indicator) {
-        const rows = Array.isArray(indicator?.data) ? indicator.data : [];
-        renderChart("chart-orders-status", {
-            type: "doughnut",
-            data: {
-                labels: rows.map(row => row.status),
-                datasets: [{ data: rows.map(row => Number(row.count || 0)), backgroundColor: ["#0D0000", "#6B6B6B", "#F5F5F5"], borderColor: "#FFFFFF" }]
-            },
-            options: {
-                plugins: { legend: { position: "bottom", labels: { color: "#0D0000" } } },
-                maintainAspectRatio: false
-            }
-        });
-    }
-
-    function renderStockEffectiveness(indicator) {
-        const data = indicator?.data || {};
-        const details = document.getElementById("stock-effectiveness-details");
-        const lowStockRows = Array.isArray(data.lowStockList) ? data.lowStockList : [];
-        details.innerHTML = `
-            <div><span>Productos con stock bajo</span><strong>${data.lowStockProducts ?? 0}</strong></div>
-            <div><span>Productos agotados</span><strong>${data.outOfStockProducts ?? 0}</strong></div>
-            <div><span>Alertas pendientes</span><strong>${data.pendingAlerts ?? 0}</strong></div>
-            <div><span>Alertas atendidas</span><strong>${data.attendedAlerts ?? 0}</strong></div>
-            <div class="stock-watchlist">
-                <h4>Productos con stock bajo</h4>
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Categoría</th>
-                                <th class="text-end">Stock</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${lowStockRows.length ? lowStockRows.map(row => `
-                                <tr>
-                                    <td>${StoreUtils.escapeHtml(row.product)}</td>
-                                    <td>${StoreUtils.escapeHtml(row.category)}</td>
-                                    <td class="text-end">${row.stock}</td>
-                                </tr>
-                            `).join("") : `<tr><td colspan="3" class="text-center text-muted py-3">No hay productos críticos por ahora.</td></tr>`}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         `;
     }
 
-    function renderChart(id, config) {
-        const canvas = document.getElementById(id);
-        if (!canvas || typeof Chart === "undefined") return;
-        indicatorCharts.push(new Chart(canvas, config));
-    }
-
-    function destroyCharts() {
-        indicatorCharts.forEach(chart => chart.destroy());
-        indicatorCharts = [];
-    }
-
-    function baseChartOptions(indexAxis = "x") {
-        return {
-            indexAxis,
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { ticks: { color: "#6B6B6B" }, grid: { color: "rgba(107, 107, 107, 0.14)" } },
-                y: { ticks: { color: "#6B6B6B" }, grid: { color: "rgba(107, 107, 107, 0.14)" } }
-            }
-        };
-    }
-
-    function emptyIndicators() {
-        const card = (title) => ({
-            title,
-            description: "Indicador pendiente de datos.",
-            formula: "No disponible",
-            frequency: "Según operación",
-            goal: "Mantener control operativo.",
-            status: "ATTENTION",
-            valueLabel: "Sin datos",
-            message: "No hay datos suficientes para calcular este indicador.",
-            data: []
+    function bindProductActions() {
+        document.querySelectorAll("[data-admin-edit], [data-admin-image]").forEach(button => {
+            button.onclick = () => {
+                const id = button.dataset.adminEdit || button.dataset.adminImage;
+                const product = adminProducts.find(item => Number(item.id) === Number(id));
+                openProductModal(product);
+            };
         });
-        return {
-            summary: { totalProducts: 0, totalCategories: 0, totalOrders: 0, accumulatedSales: 0, lowStockProducts: 0 },
-            inventoryRotation: card("Índice de Rotación de Inventario por Categoría"),
-            dailySalesDensity: { ...card("Densidad de Ventas Diarias"), data: { series: [] } },
-            profitabilityRanking: card("Ranking de Rentabilidad por Producto"),
-            minimumStockEffectiveness: { ...card("Tasa de Efectividad de Stock Mínimo"), data: {} },
-            conversionRate: card("Tasa de Conversión de Ventas"),
-            cartAbandonmentRate: card("Tasa de Abandono del Carrito"),
-            catalogLoadTime: card("Tiempo Promedio de Carga del Catálogo"),
-            confirmedOrdersRate: card("Porcentaje de Pedidos Confirmados Correctamente")
-        };
+        document.querySelectorAll("[data-admin-toggle]").forEach(button => {
+            button.onclick = () => toggleProductStatus(Number(button.dataset.adminToggle));
+        });
     }
 
-    function statusClass(status) {
-        return { GOOD: "good", ATTENTION: "attention", CRITICAL: "critical" }[status] || "attention";
+    function stockState(stockValue) {
+        const stock = Number(stockValue || 0);
+        if (stock <= 0) return { label: "Agotado", className: "empty" };
+        if (stock <= LOW_STOCK_LIMIT) return { label: `Stock bajo (${stock})`, className: "low" };
+        return { label: `Disponible (${stock})`, className: "ok" };
     }
 
-    function statusLabel(status) {
-        return { GOOD: "Bueno", ATTENTION: "Atención", CRITICAL: "Crítico" }[status] || "Atención";
-    }
-
-    function formatDecimal(value) {
-        return Number(value || 0).toFixed(2);
-    }
-
-    function emptyRow(colspan) {
-        return `<tr><td colspan="${colspan}" class="text-center text-muted py-4">No hay datos suficientes para calcular este indicador.</td></tr>`;
-    }
-
-    function renderCategories() {
+    function renderCategories(categories) {
         const list = document.getElementById("admin-categories-list");
         if (!list) return;
-        const categories = Store.categories();
         list.innerHTML = categories.length
             ? categories.map(category => `
                 <div class="category-chip">
@@ -308,60 +161,10 @@ const Admin = (() => {
         });
     }
 
-    function renderProducts() {
-        const table = document.getElementById("admin-products-table");
-        if (!table) return;
-        const products = Store.allProducts();
-        table.innerHTML = products.length
-            ? products.map(product => `
-                <tr>
-                    <td>
-                        <div class="table-product">
-                            <img src="${StoreUtils.escapeHtml(StoreUtils.productImage(product))}" alt="" ${StoreUtils.imageFallbackAttr()}>
-                            <div>
-                                <strong>${StoreUtils.escapeHtml(product.name)}</strong>
-                                <span>${StoreUtils.escapeHtml(product.description).slice(0, 80)}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${StoreUtils.escapeHtml(StoreUtils.categoryName(product))}</td>
-                    <td>${StoreUtils.money(product.price)}</td>
-                    <td>${product.stock}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-primary" data-admin-edit="${product.id}" title="Editar"><i class="bi bi-pencil"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" data-admin-delete="${product.id}" title="Eliminar"><i class="bi bi-trash"></i></button>
-                    </td>
-                </tr>
-            `).join("")
-            : `<tr><td colspan="5" class="text-center text-muted py-4">No hay productos activos.</td></tr>`;
-
-        document.querySelectorAll("[data-admin-edit]").forEach(button => {
-            button.onclick = () => {
-                const product = products.find(item => Number(item.id) === Number(button.dataset.adminEdit));
-                openProductModal(product);
-            };
-        });
-
-        document.querySelectorAll("[data-admin-delete]").forEach(button => {
-            button.onclick = async () => {
-                const product = products.find(item => Number(item.id) === Number(button.dataset.adminDelete));
-                if (!confirm(`Desactivar "${product.name}"?`)) return;
-                try {
-                    await Api.deleteProduct(product.id);
-                    await Store.refresh();
-                    renderProducts();
-                    StoreUtils.toast("Producto desactivado", "success");
-                } catch (error) {
-                    StoreUtils.toast(error.message, "danger");
-                }
-            };
-        });
-    }
-
-    function fillCategorySelect(selectedId = "") {
+    function renderCategoryOptions(categories, selectedId = "") {
         const select = document.getElementById("product-category");
         if (!select) return;
-        select.innerHTML = Store.categories()
+        select.innerHTML = `<option value="">Selecciona una categoría</option>` + categories
             .map(category => `<option value="${category.id}" ${String(category.id) === String(selectedId) ? "selected" : ""}>${StoreUtils.escapeHtml(category.name)}</option>`)
             .join("");
     }
@@ -369,37 +172,111 @@ const Admin = (() => {
     function openProductModal(product = null) {
         currentProductId = product?.id || null;
         imageUploading = false;
+        resetProductForm();
         document.getElementById("productModalLabel").textContent = product ? "Editar producto" : "Agregar producto";
         document.getElementById("product-id").value = product?.id || "";
         document.getElementById("product-name").value = product?.name || "";
-        document.getElementById("product-price").value = product?.price || "";
-        document.getElementById("product-cost-price").value = product?.costPrice || "";
-        document.getElementById("product-stock").value = product?.stock ?? 10;
+        document.getElementById("product-price").value = product?.price ?? "";
+        document.getElementById("product-cost-price").value = product?.costPrice ?? "";
+        document.getElementById("product-stock").value = product?.stock ?? 0;
         document.getElementById("product-description").value = product?.description || "";
         document.getElementById("product-image").value = product?.image || "";
-        document.getElementById("product-image-file").value = "";
+        renderCategoryOptions(adminCategories.length ? adminCategories : Store.categories(), product?.category?.id || "");
         setImagePreview(product?.image || "", product ? "Imagen actual del producto." : "Usa PNG, JPG, JPEG o WEBP.");
-        fillCategorySelect(product?.category?.id || "");
         productModal.show();
     }
 
-    function openCategoryModal(category = null) {
-        currentCategoryId = category?.id || null;
-        document.getElementById("categoryModalLabel").textContent = category ? "Editar categoría" : "Agregar categoría";
-        document.getElementById("category-id").value = category?.id || "";
-        document.getElementById("category-name").value = category?.name || "";
-        document.getElementById("category-description").value = category?.description || "";
-        showCategoryAlert("");
-        categoryModal.show();
+    function resetProductForm() {
+        const form = document.getElementById("product-form");
+        form?.reset();
+        form?.querySelectorAll(".is-invalid").forEach(input => input.classList.remove("is-invalid"));
+        StoreUtils.showAlert("#product-alert", "");
+        document.getElementById("product-image-file").value = "";
+        document.getElementById("product-image").value = "";
+        setImagePreview("", "Usa PNG, JPG, JPEG o WEBP.");
     }
 
-    async function handleProductImageSelected(event) {
-        const file = event.target.files?.[0];
-        if (!file) return;
+    function getProductFormData() {
+        return {
+            name: document.getElementById("product-name").value.trim(),
+            description: document.getElementById("product-description").value.trim(),
+            categoryId: Number(document.getElementById("product-category").value),
+            price: Number(document.getElementById("product-price").value),
+            costPrice: Number(document.getElementById("product-cost-price").value || 0),
+            stock: Number(document.getElementById("product-stock").value),
+            image: document.getElementById("product-image").value.trim()
+        };
+    }
 
+    function validateProductForm(data) {
+        const errors = {};
+        if (!data.name) errors["product-name"] = "El nombre es obligatorio.";
+        if (!data.description) errors["product-description"] = "La descripción es obligatoria.";
+        if (!data.categoryId) errors["product-category"] = "Selecciona una categoría.";
+        if (!Number.isFinite(data.price) || data.price < 0) errors["product-price"] = "El precio debe ser mayor o igual a 0.";
+        if (!Number.isFinite(data.costPrice) || data.costPrice < 0) errors["product-cost-price"] = "El costo debe ser mayor o igual a 0.";
+        if (!Number.isInteger(data.stock) || data.stock < 0) errors["product-stock"] = "El stock debe ser un número entero mayor o igual a 0.";
+        showFieldErrors(errors);
+        if (Object.keys(errors).length) {
+            StoreUtils.showAlert("#product-alert", "Revisa los campos marcados antes de guardar.", "warning");
+            return false;
+        }
+        StoreUtils.showAlert("#product-alert", "");
+        return true;
+    }
+
+    function showFieldErrors(errors) {
+        document.querySelectorAll("#product-form .is-invalid").forEach(input => input.classList.remove("is-invalid"));
+        Object.keys(errors).forEach(id => document.getElementById(id)?.classList.add("is-invalid"));
+    }
+
+    async function saveProduct(event) {
+        event.preventDefault();
+        if (imageUploading) {
+            StoreUtils.showAlert("#product-alert", "Espera a que termine la carga de la imagen.", "warning");
+            return;
+        }
+        const data = getProductFormData();
+        if (!validateProductForm(data)) return;
+
+        const button = event.submitter || document.querySelector("#product-form button[type='submit']");
+        setButtonLoading(button, true);
+        try {
+            if (currentProductId) {
+                await Api.updateProduct(currentProductId, data);
+            } else {
+                await Api.createProduct(data);
+            }
+            productModal.hide();
+            StoreUtils.showToast("Producto guardado correctamente", "success");
+            await afterAdminDataChanged();
+        } catch (error) {
+            StoreUtils.showAlert("#product-alert", error.message, "danger");
+        } finally {
+            setButtonLoading(button, false);
+        }
+    }
+
+    async function toggleProductStatus(id) {
+        const product = adminProducts.find(item => Number(item.id) === Number(id));
+        if (!product) return;
+        const nextActive = product.active === false;
+        const action = nextActive ? "activar" : "desactivar";
+        if (!confirm(`¿Quieres ${action} "${product.name}"?`)) return;
+        try {
+            await Api.updateProductStatus(product.id, nextActive);
+            StoreUtils.showToast(nextActive ? "Producto activado" : "Producto desactivado", "success");
+            await afterAdminDataChanged();
+        } catch (error) {
+            StoreUtils.showToast(error.message, "danger");
+        }
+    }
+
+    async function handleProductImageUpload(file) {
+        if (!file) return;
         if (!isValidImageFile(file)) {
-            event.target.value = "";
-            StoreUtils.toast("Selecciona una imagen PNG, JPG, JPEG o WEBP", "danger");
+            document.getElementById("product-image-file").value = "";
+            StoreUtils.showAlert("#product-alert", "Selecciona una imagen PNG, JPG, JPEG o WEBP.", "warning");
             return;
         }
 
@@ -407,15 +284,14 @@ const Admin = (() => {
         const localUrl = URL.createObjectURL(file);
         document.getElementById("product-image-preview").src = localUrl;
         document.getElementById("product-image-status").textContent = "Subiendo imagen...";
-
         try {
             const result = await Api.uploadProductImage(file);
             document.getElementById("product-image").value = result.path;
             setImagePreview(result.path, "Imagen lista para guardar.");
-            StoreUtils.toast("Imagen cargada correctamente", "success");
+            StoreUtils.showToast("Imagen cargada correctamente", "success");
         } catch (error) {
+            StoreUtils.showAlert("#product-alert", error.message, "danger");
             setImagePreview(document.getElementById("product-image").value, "No se pudo subir la imagen.");
-            StoreUtils.toast(error.message, "danger");
         } finally {
             imageUploading = false;
             URL.revokeObjectURL(localUrl);
@@ -431,6 +307,7 @@ const Admin = (() => {
     function setImagePreview(path, status) {
         const preview = document.getElementById("product-image-preview");
         const statusText = document.getElementById("product-image-status");
+        if (!preview || !statusText) return;
         preview.src = StoreUtils.productImage({ image: path });
         preview.onerror = () => {
             preview.onerror = null;
@@ -439,85 +316,362 @@ const Admin = (() => {
         statusText.textContent = status;
     }
 
-    async function saveProduct(event) {
-        event.preventDefault();
-        if (imageUploading) {
-            StoreUtils.toast("Espera a que termine la carga de la imagen", "warning");
-            return;
-        }
+    function openCategoryModal(category = null) {
+        currentCategoryId = category?.id || null;
+        resetCategoryForm();
+        document.getElementById("categoryModalLabel").textContent = category ? "Editar categoría" : "Agregar categoría";
+        document.getElementById("category-id").value = category?.id || "";
+        document.getElementById("category-name").value = category?.name || "";
+        document.getElementById("category-description").value = category?.description || "";
+        categoryModal.show();
+    }
 
-        const button = event.submitter || document.querySelector("#product-form button[type='submit']");
-        button.disabled = true;
-        const payload = {
-            name: document.getElementById("product-name").value.trim(),
-            description: document.getElementById("product-description").value.trim(),
-            categoryId: Number(document.getElementById("product-category").value),
-            price: Number(document.getElementById("product-price").value),
-            costPrice: Number(document.getElementById("product-cost-price").value || 0),
-            stock: Number(document.getElementById("product-stock").value),
-            image: document.getElementById("product-image").value.trim()
+    function resetCategoryForm() {
+        document.getElementById("category-form")?.reset();
+        StoreUtils.showAlert("#category-alert", "");
+        document.getElementById("category-name")?.classList.remove("is-invalid");
+    }
+
+    function getCategoryFormData() {
+        return {
+            name: document.getElementById("category-name").value.trim(),
+            description: document.getElementById("category-description").value.trim()
         };
+    }
 
-        try {
-            if (currentProductId) {
-                await Api.updateProduct(currentProductId, payload);
-                StoreUtils.toast("Producto actualizado", "success");
-            } else {
-                await Api.createProduct(payload);
-                StoreUtils.toast("Producto creado", "success");
-            }
-            productModal.hide();
-            await Store.refresh();
-            renderProducts();
-        } catch (error) {
-            StoreUtils.toast(error.message, "danger");
-        } finally {
-            button.disabled = false;
+    function validateCategoryForm(data) {
+        const nameInput = document.getElementById("category-name");
+        nameInput.classList.toggle("is-invalid", !data.name);
+        if (!data.name) {
+            StoreUtils.showAlert("#category-alert", "El nombre de categoría es obligatorio.", "warning");
+            return false;
         }
+        StoreUtils.showAlert("#category-alert", "");
+        return true;
     }
 
     async function saveCategory(event) {
         event.preventDefault();
+        const data = getCategoryFormData();
+        if (!validateCategoryForm(data)) return;
+
         const button = event.submitter || document.querySelector("#category-form button[type='submit']");
-        button.disabled = true;
-        showCategoryAlert("");
-
-        const payload = {
-            name: document.getElementById("category-name").value.trim(),
-            description: document.getElementById("category-description").value.trim()
-        };
-
+        setButtonLoading(button, true);
         try {
             if (currentCategoryId) {
-                await Api.updateCategory(currentCategoryId, payload);
-                StoreUtils.toast("Categoría actualizada", "success");
+                await Api.updateCategory(currentCategoryId, data);
             } else {
-                await Api.createCategory(payload);
-                StoreUtils.toast("Categoría creada", "success");
+                await Api.createCategory(data);
             }
             categoryModal.hide();
+            StoreUtils.showToast("Categoría guardada correctamente", "success");
             await Store.refresh();
-            renderCategories();
-            renderProducts();
-            fillCategorySelect(currentCategoryId || "");
+            await loadCategories();
+            if (document.getElementById("admin-products-table")) renderProductsTable(adminProducts);
+            if (document.getElementById("ind-summary-categories")) await loadIndicatorsDashboard();
         } catch (error) {
-            showCategoryAlert(error.message);
-            StoreUtils.toast(error.message, "danger");
+            const message = /existe/i.test(error.message) ? "Ya existe una categoría con ese nombre" : error.message;
+            StoreUtils.showAlert("#category-alert", message, "danger");
         } finally {
-            button.disabled = false;
+            setButtonLoading(button, false);
         }
     }
 
-    function showCategoryAlert(message) {
-        const alert = document.getElementById("category-alert");
-        if (!alert) return;
-        alert.textContent = message;
-        alert.classList.toggle("d-none", !message);
+    async function afterAdminDataChanged() {
+        await Store.refresh();
+        if (document.getElementById("admin-products-table")) await loadProducts(false);
+        if (document.getElementById("ind-summary-products")) await loadIndicatorsDashboard();
+    }
+
+    async function loadIndicatorsDashboard() {
+        destroyExistingCharts();
+        clearChartEmptyStates();
+        try {
+            const data = await Api.getAdminIndicators();
+            renderSummaryCards(data?.summary);
+            renderInventoryCharts(data);
+            renderSalesCharts(data);
+            renderExperienceIndicators(data);
+        } catch (error) {
+            StoreUtils.showToast(error.message, "danger");
+            const data = emptyIndicators();
+            renderSummaryCards(data.summary);
+            renderInventoryCharts(data);
+            renderSalesCharts(data);
+            renderExperienceIndicators(data);
+        }
+    }
+
+    function renderSummaryCards(summary = {}) {
+        setText("ind-summary-products", summary.totalProducts ?? 0);
+        setText("ind-summary-categories", summary.totalCategories ?? 0);
+        setText("ind-summary-orders", summary.totalOrders ?? 0);
+        setText("ind-summary-sales", StoreUtils.formatCurrency(summary.accumulatedSales ?? 0));
+        setText("ind-summary-low-stock", summary.lowStockProducts ?? 0);
+    }
+
+    function renderIndicatorCard(containerId, indicator) {
+        const element = document.getElementById(containerId);
+        if (!element || !indicator) return;
+        element.innerHTML = `
+            <div class="indicator-heading">
+                <div>
+                    <h3>${StoreUtils.escapeHtml(indicator.title)}</h3>
+                    <p>${StoreUtils.escapeHtml(indicator.description || "No hay datos suficientes")}</p>
+                </div>
+                <span class="indicator-status ${statusClass(indicator.status)}">${statusLabel(indicator.status)}</span>
+            </div>
+            <div class="indicator-value">${StoreUtils.escapeHtml(indicator.valueLabel || "Sin datos")}</div>
+            ${indicator.message ? `<div class="indicator-message">${StoreUtils.escapeHtml(friendlyEmptyMessage(indicator.message))}</div>` : ""}
+            <div class="indicator-meta">
+                <div><span>Fórmula</span><strong>${StoreUtils.escapeHtml(indicator.formula || "No disponible")}</strong></div>
+                <div><span>Frecuencia</span><strong>${StoreUtils.escapeHtml(indicator.frequency || "No definida")}</strong></div>
+                <div><span>Meta</span><strong>${StoreUtils.escapeHtml(indicator.goal || "Mantener control operativo.")}</strong></div>
+            </div>
+        `;
+    }
+
+    function renderInventoryCharts(data) {
+        const rotation = data.inventoryRotation;
+        const stock = data.minimumStockEffectiveness;
+        renderIndicatorCard("indicator-inventoryRotation", rotation);
+        renderIndicatorCard("indicator-minimumStockEffectiveness", stock);
+
+        const rotationRows = Array.isArray(rotation?.data) ? rotation.data : [];
+        renderTable("table-inventory-rotation", rotationRows, 4, row => `
+            <tr>
+                <td>${StoreUtils.escapeHtml(row.category)}</td>
+                <td>${row.unitsSold}</td>
+                <td>${formatDecimal(row.averageStock)}</td>
+                <td>${formatDecimal(row.rotation)}x</td>
+            </tr>
+        `);
+
+        if (rotationRows.length) {
+            createChart("chart-inventory-rotation", "bar", rotationRows.map(row => row.category), [{
+                label: "Rotación",
+                data: rotationRows.map(row => Number(row.rotation || 0)),
+                backgroundColor: "#0D0000"
+            }], baseChartOptions());
+        } else {
+            renderEmptyState("chart-inventory-rotation", "No hay datos suficientes");
+        }
+
+        renderStockEffectiveness(stock);
+    }
+
+    function renderSalesCharts(data) {
+        const dailySales = data.dailySalesDensity;
+        const profitability = data.profitabilityRanking;
+        const ordersRate = data.confirmedOrdersRate;
+        renderIndicatorCard("indicator-dailySalesDensity", dailySales);
+        renderIndicatorCard("indicator-profitabilityRanking", profitability);
+        renderIndicatorCard("indicator-confirmedOrdersRate", ordersRate);
+
+        const series = Array.isArray(dailySales?.data?.series) ? dailySales.data.series : [];
+        document.getElementById("daily-sales-details").innerHTML = `
+            <div><span>Día con mayor ingreso</span><strong>${StoreUtils.escapeHtml(dailySales?.data?.bestDay || "Sin datos")}</strong></div>
+            <div><span>Total acumulado</span><strong>${StoreUtils.formatCurrency(dailySales?.data?.total || 0)}</strong></div>
+        `;
+        if (series.length) {
+            createChart("chart-daily-sales", "line", series.map(row => row.date), [{
+                label: "Ingresos diarios",
+                data: series.map(row => Number(row.revenue || 0)),
+                borderColor: "#0D0000",
+                backgroundColor: "rgba(13, 0, 0, 0.12)",
+                tension: 0.32,
+                fill: true
+            }], baseChartOptions());
+        } else {
+            renderEmptyState("chart-daily-sales", "No hay datos suficientes");
+        }
+
+        const products = Array.isArray(profitability?.data) ? profitability.data : [];
+        renderTable("table-profitability", products, 5, row => `
+            <tr>
+                <td>${StoreUtils.escapeHtml(row.product)}</td>
+                <td>${StoreUtils.formatCurrency(row.salePrice)}</td>
+                <td>${row.costRegistered ? StoreUtils.formatCurrency(row.costPrice) : "Costo no registrado"}</td>
+                <td>${row.unitsSold}</td>
+                <td>${StoreUtils.formatCurrency(row.margin)}</td>
+            </tr>
+        `);
+        if (products.length) {
+            createChart("chart-profitability", "bar", products.map(row => row.product), [{
+                label: "Margen",
+                data: products.map(row => Number(row.margin || 0)),
+                backgroundColor: "#6B6B6B"
+            }], baseChartOptions("y"));
+        } else {
+            renderEmptyState("chart-profitability", "No hay datos suficientes");
+        }
+
+        const orderRows = Array.isArray(ordersRate?.data) ? ordersRate.data : [];
+        if (orderRows.some(row => Number(row.count || 0) > 0)) {
+            createChart("chart-orders-status", "doughnut", orderRows.map(row => row.status), [{
+                data: orderRows.map(row => Number(row.count || 0)),
+                backgroundColor: ["#0D0000", "#6B6B6B", "#F5F5F5"],
+                borderColor: "#FFFFFF"
+            }], { plugins: { legend: { position: "bottom", labels: { color: "#0D0000" } } }, maintainAspectRatio: false });
+        } else {
+            renderEmptyState("chart-orders-status", "No hay datos suficientes");
+        }
+    }
+
+    function renderExperienceIndicators(data) {
+        renderIndicatorCard("indicator-conversionRate", data.conversionRate);
+        renderIndicatorCard("indicator-cartAbandonmentRate", data.cartAbandonmentRate);
+        renderIndicatorCard("indicator-catalogLoadTime", data.catalogLoadTime);
+    }
+
+    function renderStockEffectiveness(indicator) {
+        const data = indicator?.data || {};
+        const details = document.getElementById("stock-effectiveness-details");
+        if (!details) return;
+        const lowStockRows = Array.isArray(data.lowStockList) ? data.lowStockList : [];
+        details.innerHTML = `
+            <div><span>Productos con stock bajo</span><strong>${data.lowStockProducts ?? 0}</strong></div>
+            <div><span>Productos agotados</span><strong>${data.outOfStockProducts ?? 0}</strong></div>
+            <div><span>Alertas pendientes</span><strong>${data.pendingAlerts ?? 0}</strong></div>
+            <div><span>Alertas atendidas</span><strong>${data.attendedAlerts ?? 0}</strong></div>
+            <div class="stock-watchlist">
+                <h4>Productos con stock bajo</h4>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead><tr><th>Producto</th><th>Categoría</th><th class="text-end">Stock</th></tr></thead>
+                        <tbody>
+                            ${lowStockRows.length ? lowStockRows.map(row => `
+                                <tr>
+                                    <td>${StoreUtils.escapeHtml(row.product)}</td>
+                                    <td>${StoreUtils.escapeHtml(row.category)}</td>
+                                    <td class="text-end">${row.stock}</td>
+                                </tr>
+                            `).join("") : `<tr><td colspan="3" class="text-center text-muted py-3">No hay productos críticos por ahora.</td></tr>`}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    function createChart(canvasId, type, labels, datasets, options = {}) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || typeof Chart === "undefined") return;
+        canvas.classList.remove("d-none");
+        const chart = new Chart(canvas, { type, data: { labels, datasets }, options });
+        indicatorCharts.push(chart);
+    }
+
+    function destroyExistingCharts() {
+        indicatorCharts.forEach(chart => chart.destroy());
+        indicatorCharts = [];
+    }
+
+    function renderEmptyState(canvasId, message) {
+        const canvas = document.getElementById(canvasId);
+        const box = canvas?.closest(".chart-box");
+        if (!canvas || !box) return;
+        const context = canvas.getContext("2d");
+        context?.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.classList.add("d-none");
+        let empty = box.querySelector(".chart-empty-state");
+        if (!empty) {
+            empty = document.createElement("div");
+            empty.className = "chart-empty-state";
+            box.appendChild(empty);
+        }
+        empty.textContent = message;
+    }
+
+    function clearChartEmptyStates() {
+        document.querySelectorAll(".chart-box canvas").forEach(canvas => canvas.classList.remove("d-none"));
+        document.querySelectorAll(".chart-empty-state").forEach(element => element.remove());
+    }
+
+    function baseChartOptions(indexAxis = "x") {
+        return {
+            indexAxis,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: typeScales(indexAxis)
+        };
+    }
+
+    function typeScales() {
+        return {
+            x: { ticks: { color: "#6B6B6B" }, grid: { color: "rgba(107, 107, 107, 0.14)" } },
+            y: { ticks: { color: "#6B6B6B" }, grid: { color: "rgba(107, 107, 107, 0.14)" } }
+        };
+    }
+
+    function renderTable(id, rows, colspan, rowTemplate) {
+        const table = document.getElementById(id);
+        if (!table) return;
+        table.innerHTML = rows.length ? rows.map(rowTemplate).join("") : emptyRow(colspan, "No hay datos suficientes");
+    }
+
+    function emptyIndicators() {
+        const card = (title) => ({
+            title,
+            description: "Indicador pendiente de datos.",
+            formula: "No disponible",
+            frequency: "Según operación",
+            goal: "Mantener control operativo.",
+            status: "ATTENTION",
+            valueLabel: "Sin datos",
+            message: "No hay datos suficientes",
+            data: []
+        });
+        return {
+            summary: { totalProducts: 0, totalCategories: 0, totalOrders: 0, accumulatedSales: 0, lowStockProducts: 0 },
+            inventoryRotation: card("Índice de Rotación de Inventario por Categoría"),
+            dailySalesDensity: { ...card("Densidad de Ventas Diarias"), data: { series: [] } },
+            profitabilityRanking: card("Ranking de Rentabilidad por Producto"),
+            minimumStockEffectiveness: { ...card("Tasa de Efectividad de Stock Mínimo"), data: {} },
+            conversionRate: card("Tasa de Conversión de Ventas"),
+            cartAbandonmentRate: card("Tasa de Abandono del Carrito"),
+            catalogLoadTime: card("Tiempo Promedio de Carga del Catálogo"),
+            confirmedOrdersRate: card("Porcentaje de Pedidos Confirmados Correctamente")
+        };
+    }
+
+    function friendlyEmptyMessage(message) {
+        return /datos suficientes/i.test(message || "") ? "No hay datos suficientes" : message;
+    }
+
+    function statusClass(status) {
+        return { GOOD: "good", ATTENTION: "attention", CRITICAL: "critical" }[status] || "attention";
+    }
+
+    function statusLabel(status) {
+        return { GOOD: "Bueno", ATTENTION: "Atención", CRITICAL: "Crítico" }[status] || "Atención";
+    }
+
+    function formatDecimal(value) {
+        return Number(value || 0).toFixed(2);
     }
 
     function setText(id, value) {
         const element = document.getElementById(id);
         if (element) element.textContent = value;
+    }
+
+    function updateDashboardCategoryCounter() {
+        setText("ind-summary-categories", adminCategories.length);
+    }
+
+    function setButtonLoading(button, loading) {
+        if (!button) return;
+        button.disabled = loading;
+        button.dataset.originalText ||= button.innerHTML;
+        button.innerHTML = loading
+            ? `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Guardando...`
+            : button.dataset.originalText;
+    }
+
+    function emptyRow(colspan, message) {
+        return `<tr><td colspan="${colspan}" class="text-center text-muted py-4">${StoreUtils.escapeHtml(message)}</td></tr>`;
     }
 
     return { init, mountDashboard, mountProducts };

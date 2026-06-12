@@ -1,14 +1,9 @@
 package com.tecnostore.controller;
 
-import com.tecnostore.dto.CartEventRequest;
-import com.tecnostore.dto.PerformanceLogRequest;
-import com.tecnostore.dto.SiteVisitRequest;
+import com.tecnostore.dto.*;
 import com.tecnostore.service.AnalyticsService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 

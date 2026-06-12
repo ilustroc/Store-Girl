@@ -8,6 +8,8 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByActiveTrueOrderByIdDesc();
 
+    List<Product> findAllByOrderByIdDesc();
+
     List<Product> findByCategoryIdAndActiveTrueOrderByIdDesc(Long categoryId);
 
     long countByActiveTrue();

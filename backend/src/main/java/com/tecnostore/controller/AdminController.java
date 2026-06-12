@@ -3,10 +3,7 @@ package com.tecnostore.controller;
 import com.tecnostore.dto.AdminDashboardResponse;
 import com.tecnostore.model.Role;
 import com.tecnostore.service.AdminDashboardService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin")

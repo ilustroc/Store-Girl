@@ -1,14 +1,9 @@
 package com.tecnostore.controller;
 
-import com.tecnostore.dto.LoginRequest;
-import com.tecnostore.dto.LoginResponse;
-import com.tecnostore.dto.RegisterRequest;
+import com.tecnostore.dto.*;
 import com.tecnostore.service.AuthService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
