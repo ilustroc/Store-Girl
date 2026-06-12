@@ -1,30 +1,52 @@
 <section class="auth-page">
     <div class="auth-card">
-        <p class="eyebrow">Cuenta</p>
-        <h1>Crear cuenta</h1>
-        <p class="text-muted">Crea tu cuenta para comprar mas rapido y revisar tus pedidos.</p>
-        <form id="register-page-form">
-            <div class="mb-3">
-                <label class="form-label" for="register-name">Nombre completo</label>
-                <input class="form-control" id="register-name" type="text" required>
+        <aside class="auth-visual">
+            <span class="auth-badge"><i class="bi bi-person-plus me-1"></i>Nueva cuenta</span>
+            <h1>Crear cuenta</h1>
+            <p>Regístrate para guardar tus pedidos y acceder a una mejor experiencia de compra.</p>
+            <div class="auth-visual-list">
+                <span><i class="bi bi-clock-history"></i> Historial de pedidos</span>
+                <span><i class="bi bi-phone"></i> Tecnología para tu día a día</span>
+                <span><i class="bi bi-lock"></i> Acceso simple y protegido</span>
             </div>
-            <div class="mb-3">
-                <label class="form-label" for="register-email">Correo</label>
-                <input class="form-control" id="register-email" type="email" required>
+        </aside>
+
+        <div class="auth-form">
+            <p class="eyebrow">Únete a TecnoStore</p>
+            <h2>Crear cuenta</h2>
+            <p class="text-muted">Completa tus datos para comprar más rápido y seguir tus pedidos.</p>
+
+            <div class="alert d-none" id="auth-alert" role="alert"></div>
+
+            <form id="register-page-form" novalidate>
+                <div class="mb-3">
+                    <label class="form-label" for="register-name">Nombre completo</label>
+                    <input class="form-control" id="register-name" name="fullName" type="text" autocomplete="name" required>
+                    <div class="invalid-feedback">Ingresa tu nombre completo.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="register-email">Correo electrónico</label>
+                    <input class="form-control" id="register-email" name="email" type="email" autocomplete="email" required>
+                    <div class="invalid-feedback">Ingresa un correo electrónico válido.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="register-phone">Teléfono</label>
+                    <input class="form-control" id="register-phone" name="phone" type="tel" autocomplete="tel">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="register-password">Contraseña</label>
+                    <input class="form-control" id="register-password" name="password" type="password" autocomplete="new-password" required>
+                    <div class="invalid-feedback">Ingresa una contraseña.</div>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">
+                    <i class="bi bi-person-check me-2"></i>Crear cuenta
+                </button>
+            </form>
+
+            <div class="auth-helper">
+                <span>¿Ya tienes cuenta?</span>
+                <a href="#/login">Inicia sesión</a>
             </div>
-            <div class="mb-3">
-                <label class="form-label" for="register-phone">Telefono</label>
-                <input class="form-control" id="register-phone" type="tel">
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="register-password">Password</label>
-                <input class="form-control" id="register-password" type="password" minlength="4" required>
-            </div>
-            <button class="btn btn-primary w-100" type="submit">Registrarme</button>
-        </form>
-        <div class="auth-switch">
-            <span>Ya tienes cuenta?</span>
-            <a href="#/login">Ingresar</a>
         </div>
     </div>
 </section>

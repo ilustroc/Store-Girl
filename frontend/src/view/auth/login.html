@@ -1,22 +1,43 @@
 <section class="auth-page">
     <div class="auth-card">
-        <p class="eyebrow">Cuenta</p>
-        <h1>Iniciar sesión</h1>
-        <p class="text-muted">Accede a tus pedidos, carrito y beneficios de compra.</p>
-        <form id="login-page-form">
-            <div class="mb-3">
-                <label class="form-label" for="login-email">Correo</label>
-                <input class="form-control" id="login-email" type="email" value="admin@gmail.com" required>
+        <aside class="auth-visual">
+            <span class="auth-badge"><i class="bi bi-shield-check me-1"></i>Acceso seguro</span>
+            <h1>Bienvenido de nuevo</h1>
+            <p>Accede a tu cuenta y continúa explorando tecnología seleccionada para estudiar, trabajar y disfrutar.</p>
+            <div class="auth-visual-list">
+                <span><i class="bi bi-bag-check"></i> Revisa tus pedidos</span>
+                <span><i class="bi bi-cart3"></i> Continúa tus compras</span>
+                <span><i class="bi bi-stars"></i> Administra tu experiencia</span>
             </div>
-            <div class="mb-3">
-                <label class="form-label" for="login-password">Password</label>
-                <input class="form-control" id="login-password" type="password" value="admin" required>
+        </aside>
+
+        <div class="auth-form">
+            <p class="eyebrow">Cuenta TecnoStore</p>
+            <h2>Iniciar sesión</h2>
+            <p class="text-muted">Compra, revisa tus pedidos y administra tu experiencia en TecnoStore.</p>
+
+            <div class="alert d-none" id="auth-alert" role="alert"></div>
+
+            <form id="login-page-form" novalidate>
+                <div class="mb-3">
+                    <label class="form-label" for="login-email">Correo electrónico</label>
+                    <input class="form-control" id="login-email" name="email" type="email" autocomplete="email" required>
+                    <div class="invalid-feedback">Ingresa un correo electrónico válido.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="login-password">Contraseña</label>
+                    <input class="form-control" id="login-password" name="password" type="password" autocomplete="current-password" required>
+                    <div class="invalid-feedback">Ingresa tu contraseña.</div>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+                </button>
+            </form>
+
+            <div class="auth-helper">
+                <span>¿No tienes cuenta?</span>
+                <a href="#/registro">Regístrate</a>
             </div>
-            <button class="btn btn-primary w-100" type="submit">Ingresar</button>
-        </form>
-        <div class="auth-switch">
-            <span>No tienes cuenta?</span>
-            <a href="#/registro">Crear cuenta</a>
         </div>
     </div>
 </section>
