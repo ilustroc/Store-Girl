@@ -1,0 +1,19 @@
+@startuml
+title Autorización por Roles
+actor Admin
+actor Usuario
+participant Frontend
+participant JwtAuthenticationFilter
+participant SecurityConfig
+participant Controller
+
+Admin -> Frontend : Acción administrativa
+Frontend -> JwtAuthenticationFilter : Authorization Bearer JWT
+JwtAuthenticationFilter -> SecurityConfig : Autenticación y roles
+SecurityConfig -> Controller : Permite ROLE_ADMIN
+
+Usuario -> Frontend : Intenta endpoint admin
+Frontend -> JwtAuthenticationFilter : Authorization Bearer JWT
+JwtAuthenticationFilter -> SecurityConfig : ROLE_USER
+SecurityConfig --> Frontend : 403 Forbidden
+@enduml

@@ -22,12 +22,14 @@
                             <select class="form-select" id="product-category" required></select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label" for="product-price">Precio</label>
-                            <input class="form-control" id="product-price" type="number" min="0" step="0.01" required>
+                            <label class="form-label" for="product-price">Precio de venta</label>
+                            <input class="form-control" id="product-price" type="number" min="0.01" step="0.01" aria-describedby="product-price-help" required>
+                            <div class="form-text" id="product-price-help">Es el precio que ve y paga el cliente.</div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label" for="product-cost-price">Costo</label>
-                            <input class="form-control" id="product-cost-price" type="number" min="0" step="0.01" placeholder="0.00">
+                            <label class="form-label" for="product-cost-price">Costo interno</label>
+                            <input class="form-control" id="product-cost-price" type="number" min="0" step="0.01" placeholder="0.00" aria-describedby="product-cost-price-help">
+                            <div class="form-text" id="product-cost-price-help">Es lo que le cuesta a la tienda; no se muestra al cliente.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="product-stock">Stock</label>

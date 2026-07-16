@@ -31,12 +31,28 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="register-phone">Teléfono</label>
-                    <input class="form-control" id="register-phone" name="phone" type="tel" autocomplete="tel">
+                    <input class="form-control" id="register-phone" name="phone" type="tel" autocomplete="tel" inputmode="numeric" maxlength="9" placeholder="9XXXXXXXX" required>
+                    <div class="invalid-feedback">El teléfono debe contener 9 dígitos y comenzar con 9.</div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="register-password">Contraseña</label>
-                    <input class="form-control" id="register-password" name="password" type="password" autocomplete="new-password" required>
-                    <div class="invalid-feedback">Ingresa una contraseña.</div>
+                    <div class="input-group has-validation">
+                        <input class="form-control" id="register-password" name="password" type="password" autocomplete="new-password" required>
+                        <button class="btn btn-outline-secondary" type="button" data-password-toggle="register-password" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                            <svg data-password-icon="show" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="d-none" data-password-icon="hide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M10.7 5.2A10.7 10.7 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-3.2 4.3"></path>
+                                <path d="M6.6 6.6C3.6 8.6 2 12 2 12s3.5 7 10 7c1.7 0 3.2-.4 4.4-1"></path>
+                                <path d="M14.1 14.1A3 3 0 0 1 9.9 9.9"></path>
+                                <path d="M3 3l18 18"></path>
+                            </svg>
+                        </button>
+                        <div class="invalid-feedback">Ingresa una contraseña.</div>
+                    </div>
+                    <div class="form-text">La contraseña debe contener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.</div>
                 </div>
                 <button class="btn btn-primary w-100" type="submit">
                     <i class="bi bi-person-check me-2"></i>Crear cuenta

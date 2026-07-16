@@ -8,6 +8,7 @@ const Admin = (() => {
     let adminProducts = [];
     let adminCategories = [];
     let indicatorCharts = [];
+    let reportState = { report: null, page: 1, pageSize: 10, sortKey: "", sortDir: "asc" };
 
     function init() {
         productModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("productModal"));
@@ -32,6 +33,13 @@ const Admin = (() => {
         await loadProducts();
     }
 
+    async function mountReports() {
+        if (!Auth.requireAdmin()) return;
+        await loadReportCategories();
+        bindReportButtons();
+        await loadReport();
+    }
+
     function bindAdminButtons() {
         ["btn-new-product", "btn-new-product-inline"].forEach(id => {
             document.getElementById(id)?.addEventListener("click", () => openProductModal());
@@ -49,20 +57,20 @@ const Admin = (() => {
     async function loadProducts(showLoading = true) {
         const table = document.getElementById("admin-products-table");
         if (showLoading && table) {
-            table.innerHTML = emptyRow(7, "Cargando productos...");
+            table.innerHTML = emptyRow(8, "Cargando productos...");
         }
         try {
             adminProducts = await Api.getAdminProducts();
             renderProductsTable(adminProducts);
         } catch (error) {
-            if (table) table.innerHTML = emptyRow(7, "No se pudieron cargar los productos.");
+            if (table) table.innerHTML = emptyRow(8, "No se pudieron cargar los productos.");
             StoreUtils.showToast(error.message, "danger");
         }
     }
 
     async function loadCategories() {
         try {
-            adminCategories = await Api.getCategories();
+            adminCategories = await Api.getAdminCategories();
             renderCategoryOptions(adminCategories);
             renderCategories(adminCategories);
             updateDashboardCategoryCounter();
@@ -76,7 +84,7 @@ const Admin = (() => {
         if (!table) return;
         table.innerHTML = products.length
             ? products.map(productRowTemplate).join("")
-            : emptyRow(7, "No hay productos registrados.");
+            : emptyRow(8, "No hay productos registrados.");
         bindProductActions();
     }
 
@@ -99,6 +107,7 @@ const Admin = (() => {
                 <td>${StoreUtils.formatCurrency(product.costPrice || 0)}</td>
                 <td><span class="stock-state ${stock.className}">${stock.label}</span></td>
                 <td><span class="status-pill ${active ? "active" : "inactive"}">${active ? "Activo" : "Inactivo"}</span></td>
+                <td>${StoreUtils.formatDate(product.createdAt)}</td>
                 <td class="text-end">
                     <div class="admin-row-actions">
                         <button class="btn btn-sm btn-outline-primary" data-admin-edit="${product.id}" title="Editar">
@@ -213,8 +222,8 @@ const Admin = (() => {
         if (!data.name) errors["product-name"] = "El nombre es obligatorio.";
         if (!data.description) errors["product-description"] = "La descripción es obligatoria.";
         if (!data.categoryId) errors["product-category"] = "Selecciona una categoría.";
-        if (!Number.isFinite(data.price) || data.price < 0) errors["product-price"] = "El precio debe ser mayor o igual a 0.";
-        if (!Number.isFinite(data.costPrice) || data.costPrice < 0) errors["product-cost-price"] = "El costo debe ser mayor o igual a 0.";
+        if (!Number.isFinite(data.price) || data.price <= 0) errors["product-price"] = "El precio de venta debe ser mayor a 0.";
+        if (!Number.isFinite(data.costPrice) || data.costPrice < 0) errors["product-cost-price"] = "El costo interno debe ser mayor o igual a 0.";
         if (!Number.isInteger(data.stock) || data.stock < 0) errors["product-stock"] = "El stock debe ser un número entero mayor o igual a 0.";
         showFieldErrors(errors);
         if (Object.keys(errors).length) {
@@ -652,6 +661,158 @@ const Admin = (() => {
         return Number(value || 0).toFixed(2);
     }
 
+    async function loadReportCategories() {
+        const select = document.getElementById("report-category");
+        if (!select) return;
+        try {
+            const categories = await Api.getCategories();
+            select.innerHTML = `<option value="">Todas</option>` + categories
+                .map(category => `<option value="${category.id}">${StoreUtils.escapeHtml(category.name)}</option>`)
+                .join("");
+        } catch {
+            select.innerHTML = `<option value="">Todas</option>`;
+        }
+    }
+
+    function bindReportButtons() {
+        document.getElementById("reports-filter-form")?.addEventListener("submit", loadReport);
+        document.getElementById("btn-report-clear")?.addEventListener("click", async () => {
+            document.getElementById("reports-filter-form")?.reset();
+            reportState = { report: null, page: 1, pageSize: 10, sortKey: "", sortDir: "asc" };
+            await loadReport();
+        });
+        document.getElementById("btn-report-xlsx")?.addEventListener("click", event => exportReport("xlsx", event.currentTarget));
+        document.getElementById("btn-report-pdf")?.addEventListener("click", event => exportReport("pdf", event.currentTarget));
+        document.getElementById("report-prev-page")?.addEventListener("click", () => changeReportPage(-1));
+        document.getElementById("report-next-page")?.addEventListener("click", () => changeReportPage(1));
+    }
+
+    async function loadReport(event) {
+        event?.preventDefault();
+        const button = event?.submitter || document.getElementById("btn-report-search");
+        setButtonLoading(button, true, "Buscando...");
+        StoreUtils.showAlert("#report-alert", "");
+        try {
+            const { type, filters } = getReportFilters();
+            const report = await Api.getReport(type, filters);
+            reportState.report = report;
+            reportState.page = 1;
+            renderReport();
+        } catch (error) {
+            renderReportError(error.message);
+        } finally {
+            setButtonLoading(button, false);
+        }
+    }
+
+    function getReportFilters() {
+        const form = document.getElementById("reports-filter-form");
+        const data = Object.fromEntries(new FormData(form).entries());
+        const type = data.type || "sales";
+        delete data.type;
+        return { type, filters: data };
+    }
+
+    function renderReport() {
+        const report = reportState.report;
+        if (!report) return;
+        setText("report-title", report.title || "Reporte");
+        setText("report-total", `${report.totalRecords || 0} registro${Number(report.totalRecords || 0) === 1 ? "" : "s"}`);
+        renderReportSummary(report.summary || {});
+        renderReportTable(report.columns || [], report.rows || []);
+    }
+
+    function renderReportSummary(summary) {
+        const container = document.getElementById("report-summary");
+        if (!container) return;
+        container.innerHTML = Object.entries(summary).slice(0, 4).map(([key, value]) => `
+            <div><span>${StoreUtils.escapeHtml(key)}</span><strong>${formatReportValue(key, value)}</strong></div>
+        `).join("");
+    }
+
+    function renderReportTable(columns, rows) {
+        const head = document.getElementById("report-table-head");
+        const body = document.getElementById("report-table-body");
+        if (!head || !body) return;
+        head.innerHTML = `<tr>${columns.map(column => `
+            <th><button type="button" class="report-sort" data-report-sort="${column.key}">${StoreUtils.escapeHtml(column.label)}</button></th>
+        `).join("")}</tr>`;
+        document.querySelectorAll("[data-report-sort]").forEach(button => {
+            button.onclick = () => sortReport(button.dataset.reportSort);
+        });
+
+        const sorted = sortedReportRows(rows);
+        const totalPages = Math.max(1, Math.ceil(sorted.length / reportState.pageSize));
+        reportState.page = Math.min(reportState.page, totalPages);
+        const start = (reportState.page - 1) * reportState.pageSize;
+        const pageRows = sorted.slice(start, start + reportState.pageSize);
+        body.innerHTML = pageRows.length
+            ? pageRows.map(row => `<tr>${columns.map(column => `<td>${formatReportValue(column.key, row[column.key])}</td>`).join("")}</tr>`).join("")
+            : `<tr><td colspan="${Math.max(columns.length, 1)}" class="text-center text-muted py-4">No hay resultados para los filtros aplicados.</td></tr>`;
+        setText("report-page-label", `Página ${reportState.page} de ${totalPages}`);
+        document.getElementById("report-prev-page").disabled = reportState.page <= 1;
+        document.getElementById("report-next-page").disabled = reportState.page >= totalPages;
+    }
+
+    function sortReport(key) {
+        if (reportState.sortKey === key) {
+            reportState.sortDir = reportState.sortDir === "asc" ? "desc" : "asc";
+        } else {
+            reportState.sortKey = key;
+            reportState.sortDir = "asc";
+        }
+        renderReport();
+    }
+
+    function sortedReportRows(rows) {
+        if (!reportState.sortKey) return rows;
+        return [...rows].sort((a, b) => {
+            const left = a[reportState.sortKey] ?? "";
+            const right = b[reportState.sortKey] ?? "";
+            const result = Number.isFinite(Number(left)) && Number.isFinite(Number(right))
+                ? Number(left) - Number(right)
+                : String(left).localeCompare(String(right));
+            return reportState.sortDir === "asc" ? result : -result;
+        });
+    }
+
+    function changeReportPage(delta) {
+        reportState.page = Math.max(1, reportState.page + delta);
+        renderReport();
+    }
+
+    async function exportReport(format, button) {
+        const { type, filters } = getReportFilters();
+        setButtonLoading(button, true, "Exportando...");
+        StoreUtils.showAlert("#report-alert", "");
+        try {
+            await Api.exportReport(type, format, filters);
+            StoreUtils.showToast(`Reporte ${format.toUpperCase()} generado`, "success");
+        } catch (error) {
+            StoreUtils.showAlert("#report-alert", error.message, "danger");
+        } finally {
+            setButtonLoading(button, false);
+        }
+    }
+
+    function renderReportError(message) {
+        setText("report-title", "Reporte");
+        setText("report-total", "0 registros");
+        document.getElementById("report-summary").innerHTML = "";
+        document.getElementById("report-table-head").innerHTML = "";
+        document.getElementById("report-table-body").innerHTML = `<tr><td class="text-center text-danger py-4">${StoreUtils.escapeHtml(message)}</td></tr>`;
+    }
+
+    function formatReportValue(key, value) {
+        if (value === null || value === undefined) return "";
+        const moneyKeys = ["price", "cost", "costPrice", "unitPrice", "subtotal", "total", "orderTotal", "salePrice", "revenue", "totalCost", "margin", "Ingresos", "Costo total", "Margen total", "Ingresos totales", "Venta minima", "Venta maxima", "Venta promedio"];
+        if (moneyKeys.includes(key) || moneyKeys.some(item => key.toLowerCase().includes(item.toLowerCase()))) {
+            return StoreUtils.formatCurrency(value);
+        }
+        if (Array.isArray(value)) return value.map(item => StoreUtils.escapeHtml(item)).join(", ");
+        return StoreUtils.escapeHtml(value);
+    }
+
     function setText(id, value) {
         const element = document.getElementById(id);
         if (element) element.textContent = value;
@@ -661,12 +822,12 @@ const Admin = (() => {
         setText("ind-summary-categories", adminCategories.length);
     }
 
-    function setButtonLoading(button, loading) {
+    function setButtonLoading(button, loading, loadingText = "Guardando...") {
         if (!button) return;
         button.disabled = loading;
         button.dataset.originalText ||= button.innerHTML;
         button.innerHTML = loading
-            ? `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Guardando...`
+            ? `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>${loadingText}`
             : button.dataset.originalText;
     }
 
@@ -674,5 +835,5 @@ const Admin = (() => {
         return `<tr><td colspan="${colspan}" class="text-center text-muted py-4">${StoreUtils.escapeHtml(message)}</td></tr>`;
     }
 
-    return { init, mountDashboard, mountProducts };
+    return { init, mountDashboard, mountProducts, mountReports };
 })();

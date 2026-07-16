@@ -28,3 +28,6 @@ El diseno toma como referencia patrones comunes de ecommerce tecnologico:
 - Panel administrador con gestion de productos y categorias.
 
 No se copia ningun diseno exacto de tiendas reales.
+## Actualización del prototipo funcional
+
+El prototipo incluye rutas separadas para comprador y administrador. En administración se agrega `#/admin/reportes`, con filtros, resultados paginados y exportación XLSX/PDF. Las pantallas de login y registro validan contraseña segura y teléfono peruano.

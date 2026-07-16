@@ -1,272 +1,247 @@
 USE tecnostore_db;
 
-INSERT IGNORE INTO users (full_name, email, password, role, phone, active) VALUES
-('Administrador', 'admin@gmail.com', 'admin', 'ADMIN', '+51 999 888 777', TRUE),
-('Usuario Demo', 'usuario@gmail.com', 'usuario', 'USER', '+51 988 777 666', TRUE),
-('Ana Torres', 'ana.torres@gmail.com', 'usuario', 'USER', '+51 955 120 441', TRUE),
-('Carlos Ramirez', 'carlos.ramirez@gmail.com', 'usuario', 'USER', '+51 944 331 902', TRUE),
-('Valeria Soto', 'valeria.soto@gmail.com', 'usuario', 'USER', '+51 933 770 118', TRUE),
-('Diego Chavez', 'diego.chavez@gmail.com', 'usuario', 'USER', '+51 922 604 833', TRUE),
-('Mariana Vega', 'mariana.vega@gmail.com', 'usuario', 'USER', '+51 911 805 274', TRUE);
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE audit_logs;
+TRUNCATE TABLE stock_alerts;
+TRUNCATE TABLE performance_logs;
+TRUNCATE TABLE carts;
+TRUNCATE TABLE site_visits;
+TRUNCATE TABLE order_items;
+TRUNCATE TABLE orders;
+TRUNCATE TABLE products;
+TRUNCATE TABLE categories;
+TRUNCATE TABLE users;
+SET FOREIGN_KEY_CHECKS = 1;
 
-INSERT IGNORE INTO categories (name, description) VALUES
-('Smartphones', 'Telefonos inteligentes de gama media y alta'),
-('Laptops', 'Computadoras portatiles para estudio, trabajo y gaming'),
-('Tablets', 'Tablets para productividad y entretenimiento'),
-('Audio', 'Audifonos y dispositivos de sonido'),
-('Gaming', 'Consolas y perifericos para videojuegos'),
-('Wearables', 'Relojes inteligentes y dispositivos vestibles'),
-('TV', 'Televisores y pantallas inteligentes'),
-('Camaras', 'Camaras fotograficas y video profesional');
+-- Credenciales:
+-- ADMIN: admin@gmail.com / Admin@123
+-- USER:  usuario@gmail.com / Usuario@123
+INSERT INTO users (id, full_name, email, password, role, phone, active, created_at) VALUES
+(1, 'Administrador TecnoStore', 'admin@gmail.com', '$2a$10$zJko6lmGEe6FB0G1YjG9delsZ5Vjx6NpjuzxlNN7S3YEQPQvXY22W', 'ADMIN', '999100001', TRUE, '2026-01-02 08:00:00'),
+(2, 'Usuario Demo', 'usuario@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '999100002', TRUE, '2026-01-03 09:00:00'),
+(3, 'Andrea Rojas', 'andrea.rojas@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955210101', TRUE, '2026-01-05 10:15:00'),
+(4, 'Luis Mendoza', 'luis.mendoza@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955210102', TRUE, '2026-01-08 11:20:00'),
+(5, 'Camila Peña', 'camila.pena@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955210103', TRUE, '2026-01-12 14:10:00'),
+(6, 'Mateo Salazar', 'mateo.salazar@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955210104', TRUE, '2026-02-03 16:45:00');
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'iPhone 15 Pro', 'Smartphone premium con chip A17 Pro, pantalla Super Retina y camara profesional.', c.id, 1199.00, 18, 'assets/img/iphone15.png', TRUE
-FROM categories c WHERE c.name = 'Smartphones' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'iPhone 15 Pro');
+INSERT INTO categories (id, name, description, active, created_at) VALUES
+(1, 'Smartphones', 'Celulares Android y iPhone para productividad, fotografia y comunicacion.', TRUE, '2026-01-01 08:00:00'),
+(2, 'Laptops', 'Equipos portatiles para estudio, oficina, diseno y gaming.', TRUE, '2026-01-01 08:00:00'),
+(3, 'Tablets', 'Dispositivos tactiles para entretenimiento, lectura y trabajo.', TRUE, '2026-01-01 08:00:00'),
+(4, 'Audio', 'Audifonos y parlantes para musica, llamadas y entretenimiento.', TRUE, '2026-01-01 08:00:00'),
+(5, 'Gaming', 'Consolas y perifericos para videojuegos.', TRUE, '2026-01-01 08:00:00'),
+(6, 'Wearables', 'Relojes y bandas inteligentes para actividad y salud.', TRUE, '2026-01-01 08:00:00'),
+(7, 'TV', 'Televisores inteligentes para cine y entretenimiento.', TRUE, '2026-01-01 08:00:00'),
+(8, 'Camaras', 'Camaras para fotografia, video y creacion de contenido.', TRUE, '2026-01-01 08:00:00'),
+(9, 'Accesorios', 'Perifericos y complementos para equipos tecnologicos.', TRUE, '2026-01-01 08:00:00');
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'MacBook Pro M3', 'Laptop profesional con chip M3 para desarrollo, diseno y productividad avanzada.', c.id, 2299.00, 10, 'assets/img/laptop.png', TRUE
-FROM categories c WHERE c.name = 'Laptops' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'MacBook Pro M3');
+INSERT INTO products (id, name, description, category_id, price, cost_price, stock, image, active, created_at) VALUES
+(1, 'iPhone 15 Pro', 'Smartphone premium con pantalla Super Retina y camara profesional.', 1, 1199.00, 780.00, 18, 'assets/img/iphone15.png', TRUE, '2026-01-05 09:00:00'),
+(2, 'Samsung Galaxy S24', 'Smartphone Android con pantalla AMOLED, alto rendimiento y camara avanzada.', 1, 999.00, 650.00, 16, 'assets/img/galaxys24.png', TRUE, '2026-01-05 09:10:00'),
+(3, 'MacBook Pro M3', 'Laptop profesional para desarrollo, diseno y productividad avanzada.', 2, 2299.00, 1600.00, 10, 'assets/img/laptop.png', TRUE, '2026-01-05 09:20:00'),
+(4, 'Dell XPS 13', 'Ultrabook premium con pantalla compacta, diseno ligero y alto rendimiento.', 2, 1299.00, 880.00, 12, 'assets/img/dellxps13.png', TRUE, '2026-01-05 09:30:00'),
+(5, 'iPad Air', 'Tablet ligera para estudiar, dibujar, trabajar y ver contenido.', 3, 699.00, 430.00, 20, 'assets/img/ipadair.png', TRUE, '2026-01-05 09:40:00'),
+(6, 'AirPods Pro', 'Audifonos inalambricos con cancelacion activa de ruido y audio espacial.', 4, 249.00, 135.00, 35, 'assets/img/airpodspro.png', TRUE, '2026-01-05 09:50:00'),
+(7, 'Sony WH-1000XM5', 'Audifonos over-ear con cancelacion de ruido y sonido de alta calidad.', 4, 399.00, 250.00, 15, 'assets/img/sonywh1000xm5.png', TRUE, '2026-01-05 10:00:00'),
+(8, 'Nintendo Switch', 'Consola hibrida para jugar en modo portatil o conectada al televisor.', 5, 349.00, 230.00, 25, 'assets/img/nintendoswitch.png', TRUE, '2026-01-05 10:10:00'),
+(9, 'Razer DeathAdder V3', 'Mouse gaming ergonomico con sensor de alta precision.', 5, 89.00, 45.00, 40, 'assets/img/razerdeathadderv3.png', TRUE, '2026-01-05 10:20:00'),
+(10, 'Apple Watch Series 9', 'Reloj inteligente con GPS, seguimiento de salud y notificaciones.', 6, 429.00, 285.00, 22, 'assets/img/applewatchseries9.png', TRUE, '2026-01-05 10:30:00'),
+(11, 'LG OLED 65', 'Smart TV OLED 4K con HDR y alto contraste para cine en casa.', 7, 1899.00, 1280.00, 3, 'assets/img/lgoled65.png', TRUE, '2026-01-05 10:40:00'),
+(12, 'Canon EOS R6', 'Camara mirrorless profesional con enfoque rapido y grabacion 4K.', 8, 2499.00, 1750.00, 4, 'assets/img/canoneosr6.png', TRUE, '2026-01-05 10:50:00'),
+(13, 'Teclado Mecanico RGB', 'Teclado mecanico con iluminacion RGB y respuesta rapida.', 9, 229.00, 135.00, 30, 'assets/img/teclado.png', TRUE, '2026-01-05 11:00:00'),
+(14, 'Combo Accesorios Pro', 'Kit de accesorios para escritorio, productividad y estudio.', 9, 149.00, 80.00, 0, 'assets/img/teclado-1.png', TRUE, '2026-01-05 11:10:00');
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'iPad Air', 'Tablet ligera y potente para estudiar, dibujar, trabajar y ver contenido.', c.id, 699.00, 20, 'assets/img/ipadair.png', TRUE
-FROM categories c WHERE c.name = 'Tablets' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'iPad Air');
+INSERT INTO orders (id, user_id, total, status, created_at) VALUES
+(1, 3, 1448.00, 'CONFIRMED', '2026-05-10 09:15:00'),
+(2, 4, 2698.00, 'CONFIRMED', '2026-05-10 10:40:00'),
+(3, 5, 527.00, 'CONFIRMED', '2026-05-11 12:05:00'),
+(4, 6, 1899.00, 'CONFIRMED', '2026-05-12 15:30:00'),
+(5, 2, 1128.00, 'PENDING', '2026-05-13 17:20:00');
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'AirPods Pro', 'Audifonos inalambricos con cancelacion activa de ruido y audio espacial.', c.id, 249.00, 35, 'assets/img/airpodspro.png', TRUE
-FROM categories c WHERE c.name = 'Audio' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'AirPods Pro');
+INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal) VALUES
+(1, 1, 1, 1, 1199.00, 1199.00),
+(2, 1, 6, 1, 249.00, 249.00),
+(3, 2, 3, 1, 2299.00, 2299.00),
+(4, 2, 7, 1, 399.00, 399.00),
+(5, 3, 8, 1, 349.00, 349.00),
+(6, 3, 9, 2, 89.00, 178.00),
+(7, 4, 11, 1, 1899.00, 1899.00),
+(8, 5, 5, 1, 699.00, 699.00),
+(9, 5, 10, 1, 429.00, 429.00);
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'Samsung Galaxy S24', 'Smartphone Android con pantalla AMOLED, alto rendimiento y camara avanzada.', c.id, 999.00, 16, 'assets/img/galaxys24.png', TRUE
-FROM categories c WHERE c.name = 'Smartphones' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'Samsung Galaxy S24');
+-- Historial ampliado de ventas: 70 pedidos entre el 06/01/2026 y el 17/07/2026.
+-- Los identificadores altos permiten aplicar este bloque sobre una base ya iniciada.
+INSERT IGNORE INTO users (id, full_name, email, password, role, phone, active, created_at) VALUES
+(101, 'Daniela Campos', 'daniela.campos@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955310101', TRUE, '2026-01-02 09:10:00'),
+(102, 'Jorge Quispe', 'jorge.quispe@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955310102', TRUE, '2026-01-02 10:20:00'),
+(103, 'Sofia Ramirez', 'sofia.ramirez@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955310103', TRUE, '2026-01-03 11:30:00'),
+(104, 'Renato Flores', 'renato.flores@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955310104', TRUE, '2026-01-03 15:40:00'),
+(105, 'Lucia Vargas', 'lucia.vargas@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955310105', TRUE, '2026-01-04 08:50:00'),
+(106, 'Miguel Paredes', 'miguel.paredes@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955310106', TRUE, '2026-01-04 12:15:00'),
+(107, 'Fernanda Silva', 'fernanda.silva@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955310107', TRUE, '2026-01-05 09:25:00'),
+(108, 'Alonso Castillo', 'alonso.castillo@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955310108', TRUE, '2026-01-05 10:35:00');
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'Dell XPS 13', 'Ultrabook premium con pantalla compacta, diseno ligero y alto rendimiento.', c.id, 1299.00, 12, 'assets/img/dellxps13.png', TRUE
-FROM categories c WHERE c.name = 'Laptops' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'Dell XPS 13');
+CREATE TEMPORARY TABLE seed_sales_sequence (
+    sequence_number INT PRIMARY KEY
+);
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'Nintendo Switch', 'Consola hibrida para jugar en modo portatil o conectada al televisor.', c.id, 349.00, 25, 'assets/img/nintendoswitch.png', TRUE
-FROM categories c WHERE c.name = 'Gaming' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'Nintendo Switch');
+INSERT INTO seed_sales_sequence (sequence_number) VALUES
+(0), (1), (2), (3), (4), (5), (6), (7), (8), (9),
+(10), (11), (12), (13), (14), (15), (16), (17), (18), (19),
+(20), (21), (22), (23), (24), (25), (26), (27), (28), (29),
+(30), (31), (32), (33), (34), (35), (36), (37), (38), (39),
+(40), (41), (42), (43), (44), (45), (46), (47), (48), (49),
+(50), (51), (52), (53), (54), (55), (56), (57), (58), (59),
+(60), (61), (62), (63), (64), (65), (66), (67), (68), (69);
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'Apple Watch Series 9', 'Reloj inteligente con GPS, seguimiento de salud y notificaciones.', c.id, 429.00, 22, 'assets/img/applewatchseries9.png', TRUE
-FROM categories c WHERE c.name = 'Wearables' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'Apple Watch Series 9');
+INSERT IGNORE INTO orders (id, user_id, total, status, created_at)
+SELECT
+    1001 + sequence_number,
+    ELT(MOD(sequence_number, 10) + 1, 2, 3, 101, 102, 103, 104, 105, 106, 107, 108),
+    0.00,
+    CASE
+        WHEN MOD(sequence_number + 1, 13) = 0 THEN 'CANCELLED'
+        WHEN MOD(sequence_number + 1, 9) = 0 THEN 'PENDING'
+        ELSE 'CONFIRMED'
+    END,
+    TIMESTAMP(
+        DATE_ADD('2026-01-06', INTERVAL FLOOR(sequence_number * 192 / 69) DAY),
+        MAKETIME(9 + MOD(sequence_number, 10), MOD(sequence_number * 7, 60), 0)
+    )
+FROM seed_sales_sequence;
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'Sony WH-1000XM5', 'Audifonos over-ear con cancelacion de ruido lider y sonido de alta calidad.', c.id, 399.00, 15, 'assets/img/sonywh1000xm5.png', TRUE
-FROM categories c WHERE c.name = 'Audio' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'Sony WH-1000XM5');
+-- Cada pedido tiene de uno a tres productos y precios tomados del catalogo real.
+INSERT IGNORE INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
+SELECT
+    5001 + s.sequence_number,
+    1001 + s.sequence_number,
+    p.id,
+    IF(MOD(s.sequence_number, 5) = 0, 2, 1),
+    p.price,
+    p.price * IF(MOD(s.sequence_number, 5) = 0, 2, 1)
+FROM seed_sales_sequence s
+JOIN products p ON p.id = MOD(s.sequence_number * 3, 14) + 1;
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'LG OLED 65', 'Smart TV OLED 4K con HDR, Dolby Vision y alto contraste para cine en casa.', c.id, 1899.00, 8, 'assets/img/lgoled65.png', TRUE
-FROM categories c WHERE c.name = 'TV' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'LG OLED 65');
+INSERT IGNORE INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
+SELECT
+    5101 + s.sequence_number,
+    1001 + s.sequence_number,
+    p.id,
+    IF(MOD(s.sequence_number, 7) = 0, 2, 1),
+    p.price,
+    p.price * IF(MOD(s.sequence_number, 7) = 0, 2, 1)
+FROM seed_sales_sequence s
+JOIN products p
+    ON p.id = MOD(MOD(s.sequence_number * 3, 14) + 4 + MOD(s.sequence_number, 5), 14) + 1
+WHERE MOD(s.sequence_number, 3) <> 1;
 
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'Canon EOS R6', 'Camara mirrorless profesional con enfoque rapido y grabacion 4K.', c.id, 2499.00, 7, 'assets/img/canoneosr6.png', TRUE
-FROM categories c WHERE c.name = 'Camaras' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'Canon EOS R6');
-
-INSERT INTO products (name, description, category_id, price, stock, image, active)
-SELECT 'Razer DeathAdder V3', 'Mouse gaming ergonomico con sensor de alta precision y respuesta rapida.', c.id, 89.00, 40, 'assets/img/razerdeathadderv3.png', TRUE
-FROM categories c WHERE c.name = 'Gaming' AND NOT EXISTS (SELECT 1 FROM products p WHERE p.name = 'Razer DeathAdder V3');
-
-UPDATE products SET stock = LEAST(stock, 4) WHERE name = 'Canon EOS R6';
-UPDATE products SET stock = LEAST(stock, 3) WHERE name = 'LG OLED 65';
-
-UPDATE products SET cost_price = 780.00 WHERE name = 'iPhone 15 Pro';
-UPDATE products SET cost_price = 1600.00 WHERE name = 'MacBook Pro M3';
-UPDATE products SET cost_price = 430.00 WHERE name = 'iPad Air';
-UPDATE products SET cost_price = 135.00 WHERE name = 'AirPods Pro';
-UPDATE products SET cost_price = 650.00 WHERE name = 'Samsung Galaxy S24';
-UPDATE products SET cost_price = 880.00 WHERE name = 'Dell XPS 13';
-UPDATE products SET cost_price = 230.00 WHERE name = 'Nintendo Switch';
-UPDATE products SET cost_price = 285.00 WHERE name = 'Apple Watch Series 9';
-UPDATE products SET cost_price = 250.00 WHERE name = 'Sony WH-1000XM5';
-UPDATE products SET cost_price = 1280.00 WHERE name = 'LG OLED 65';
-UPDATE products SET cost_price = 1750.00 WHERE name = 'Canon EOS R6';
-UPDATE products SET cost_price = 45.00 WHERE name = 'Razer DeathAdder V3';
-
-INSERT INTO orders (id, user_id, total, status, created_at)
-SELECT 101, u.id, 0.00, 'CONFIRMED', '2026-05-10 09:15:00'
-FROM users u
-WHERE u.email = 'ana.torres@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.id = 101);
-
-INSERT INTO orders (id, user_id, total, status, created_at)
-SELECT 102, u.id, 0.00, 'CONFIRMED', '2026-05-10 10:40:00'
-FROM users u
-WHERE u.email = 'carlos.ramirez@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.id = 102);
-
-INSERT INTO orders (id, user_id, total, status, created_at)
-SELECT 103, u.id, 0.00, 'CONFIRMED', '2026-05-10 12:05:00'
-FROM users u
-WHERE u.email = 'valeria.soto@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.id = 103);
-
-INSERT INTO orders (id, user_id, total, status, created_at)
-SELECT 104, u.id, 0.00, 'CONFIRMED', '2026-05-10 15:30:00'
-FROM users u
-WHERE u.email = 'diego.chavez@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.id = 104);
-
-INSERT INTO orders (id, user_id, total, status, created_at)
-SELECT 105, u.id, 0.00, 'PENDING', '2026-05-10 17:20:00'
-FROM users u
-WHERE u.email = 'mariana.vega@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.id = 105);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1001, 101, p.id, 1, p.price, p.price
-FROM products p
-WHERE p.name = 'iPhone 15 Pro'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 101)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1001);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1002, 101, p.id, 1, p.price, p.price
-FROM products p
-WHERE p.name = 'AirPods Pro'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 101)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1002);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1003, 102, p.id, 1, p.price, p.price
-FROM products p
-WHERE p.name = 'MacBook Pro M3'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 102)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1003);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1004, 102, p.id, 1, p.price, p.price
-FROM products p
-WHERE p.name = 'Sony WH-1000XM5'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 102)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1004);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1005, 103, p.id, 1, p.price, p.price
-FROM products p
-WHERE p.name = 'Nintendo Switch'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 103)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1005);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1006, 103, p.id, 2, p.price, p.price * 2
-FROM products p
-WHERE p.name = 'Razer DeathAdder V3'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 103)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1006);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1007, 104, p.id, 1, p.price, p.price
-FROM products p
-WHERE p.name = 'LG OLED 65'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 104)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1007);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1008, 105, p.id, 1, p.price, p.price
-FROM products p
-WHERE p.name = 'iPad Air'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 105)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1008);
-
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
-SELECT 1009, 105, p.id, 1, p.price, p.price
-FROM products p
-WHERE p.name = 'Apple Watch Series 9'
-AND EXISTS (SELECT 1 FROM orders o WHERE o.id = 105)
-AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.id = 1009);
+INSERT IGNORE INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal)
+SELECT
+    5201 + s.sequence_number,
+    1001 + s.sequence_number,
+    p.id,
+    1,
+    p.price,
+    p.price
+FROM seed_sales_sequence s
+JOIN products p
+    ON p.id = MOD(MOD(s.sequence_number * 3, 14) + 10 + MOD(s.sequence_number, 2), 14) + 1
+WHERE MOD(s.sequence_number, 4) = 0;
 
 UPDATE orders o
-SET total = (
-    SELECT COALESCE(SUM(oi.subtotal), 0)
-    FROM order_items oi
-    WHERE oi.order_id = o.id
-)
-WHERE o.id IN (101, 102, 103, 104, 105);
+JOIN (
+    SELECT order_id, SUM(subtotal) AS calculated_total
+    FROM order_items
+    WHERE order_id BETWEEN 1001 AND 1070
+    GROUP BY order_id
+) totals ON totals.order_id = o.id
+SET o.total = totals.calculated_total;
 
-INSERT INTO site_visits (id, session_id, visited_at, source, page)
-SELECT 1001, 'seed-session-001', '2026-05-10 08:30:00', 'web', 'home'
-WHERE NOT EXISTS (SELECT 1 FROM site_visits sv WHERE sv.id = 1001);
+-- Actividad relacionada para mantener coherentes los indicadores de experiencia.
+INSERT IGNORE INTO site_visits (id, session_id, visited_at, source, page)
+SELECT
+    2001 + s.sequence_number,
+    CONCAT('history-session-', LPAD(s.sequence_number + 1, 3, '0')),
+    DATE_SUB(o.created_at, INTERVAL 45 MINUTE),
+    ELT(MOD(s.sequence_number, 4) + 1, 'direct', 'search', 'social', 'email'),
+    'home'
+FROM seed_sales_sequence s
+JOIN orders o ON o.id = 1001 + s.sequence_number;
 
-INSERT INTO site_visits (id, session_id, visited_at, source, page)
-SELECT 1002, 'seed-session-001', '2026-05-10 08:31:00', 'web', 'catalogo'
-WHERE NOT EXISTS (SELECT 1 FROM site_visits sv WHERE sv.id = 1002);
+INSERT IGNORE INTO site_visits (id, session_id, visited_at, source, page)
+SELECT
+    2101 + s.sequence_number,
+    CONCAT('history-session-', LPAD(s.sequence_number + 1, 3, '0')),
+    DATE_SUB(o.created_at, INTERVAL 30 MINUTE),
+    ELT(MOD(s.sequence_number, 4) + 1, 'direct', 'search', 'social', 'email'),
+    'catalogo'
+FROM seed_sales_sequence s
+JOIN orders o ON o.id = 1001 + s.sequence_number;
 
-INSERT INTO site_visits (id, session_id, visited_at, source, page)
-SELECT 1003, 'seed-session-002', '2026-05-10 09:00:00', 'web', 'catalogo'
-WHERE NOT EXISTS (SELECT 1 FROM site_visits sv WHERE sv.id = 1003);
+INSERT IGNORE INTO site_visits (id, session_id, visited_at, source, page)
+SELECT
+    2201 + s.sequence_number,
+    CONCAT('history-session-', LPAD(s.sequence_number + 1, 3, '0')),
+    DATE_SUB(o.created_at, INTERVAL 10 MINUTE),
+    ELT(MOD(s.sequence_number, 4) + 1, 'direct', 'search', 'social', 'email'),
+    'producto'
+FROM seed_sales_sequence s
+JOIN orders o ON o.id = 1001 + s.sequence_number;
 
-INSERT INTO site_visits (id, session_id, visited_at, source, page)
-SELECT 1004, 'seed-session-003', '2026-05-10 10:20:00', 'web', 'producto'
-WHERE NOT EXISTS (SELECT 1 FROM site_visits sv WHERE sv.id = 1004);
+INSERT IGNORE INTO carts (id, user_id, session_id, status, created_at, updated_at)
+SELECT
+    3001 + s.sequence_number,
+    o.user_id,
+    CONCAT('history-session-', LPAD(s.sequence_number + 1, 3, '0')),
+    CASE
+        WHEN o.status = 'CONFIRMED' THEN 'COMPLETED'
+        WHEN o.status = 'CANCELLED' THEN 'ABANDONED'
+        ELSE 'ACTIVE'
+    END,
+    DATE_SUB(o.created_at, INTERVAL 20 MINUTE),
+    o.created_at
+FROM seed_sales_sequence s
+JOIN orders o ON o.id = 1001 + s.sequence_number;
 
-INSERT INTO site_visits (id, session_id, visited_at, source, page)
-SELECT 1005, 'seed-session-004', '2026-05-10 11:10:00', 'web', 'catalogo'
-WHERE NOT EXISTS (SELECT 1 FROM site_visits sv WHERE sv.id = 1005);
+INSERT IGNORE INTO performance_logs (id, page, load_time_ms, created_at)
+SELECT
+    4001 + s.sequence_number,
+    'catalogo',
+    620 + MOD(s.sequence_number * 137, 1200),
+    DATE_SUB(o.created_at, INTERVAL 28 MINUTE)
+FROM seed_sales_sequence s
+JOIN orders o ON o.id = 1001 + s.sequence_number;
 
-INSERT INTO site_visits (id, session_id, visited_at, source, page)
-SELECT 1006, 'seed-session-005', '2026-05-10 12:40:00', 'web', 'home'
-WHERE NOT EXISTS (SELECT 1 FROM site_visits sv WHERE sv.id = 1006);
+DROP TEMPORARY TABLE seed_sales_sequence;
 
-INSERT INTO site_visits (id, session_id, visited_at, source, page)
-SELECT 1007, 'seed-session-006', '2026-05-10 13:25:00', 'web', 'catalogo'
-WHERE NOT EXISTS (SELECT 1 FROM site_visits sv WHERE sv.id = 1007);
+INSERT INTO site_visits (id, session_id, visited_at, source, page) VALUES
+(1, 'seed-session-001', '2026-05-10 08:30:00', 'web', 'home'),
+(2, 'seed-session-001', '2026-05-10 08:31:00', 'web', 'catalogo'),
+(3, 'seed-session-002', '2026-05-10 09:00:00', 'web', 'catalogo'),
+(4, 'seed-session-003', '2026-05-10 10:20:00', 'web', 'producto'),
+(5, 'seed-session-004', '2026-05-10 11:10:00', 'web', 'catalogo'),
+(6, 'seed-session-005', '2026-05-10 12:40:00', 'web', 'home'),
+(7, 'seed-session-006', '2026-05-10 13:25:00', 'web', 'catalogo');
 
-INSERT INTO site_visits (id, session_id, visited_at, source, page)
-SELECT 1008, 'seed-session-007', '2026-05-10 16:05:00', 'web', 'producto'
-WHERE NOT EXISTS (SELECT 1 FROM site_visits sv WHERE sv.id = 1008);
+INSERT INTO carts (id, user_id, session_id, status, created_at, updated_at) VALUES
+(1, 3, 'seed-session-001', 'COMPLETED', '2026-05-10 08:32:00', '2026-05-10 09:15:00'),
+(2, 4, 'seed-session-002', 'COMPLETED', '2026-05-10 09:05:00', '2026-05-10 10:40:00'),
+(3, 5, 'seed-session-003', 'COMPLETED', '2026-05-10 10:25:00', '2026-05-11 12:05:00'),
+(4, 6, 'seed-session-004', 'COMPLETED', '2026-05-10 11:12:00', '2026-05-12 15:30:00'),
+(5, 2, 'seed-session-005', 'ACTIVE', '2026-05-10 16:30:00', '2026-05-13 17:20:00'),
+(6, NULL, 'seed-session-006', 'ABANDONED', '2026-05-10 13:25:00', '2026-05-10 13:48:00');
 
-INSERT INTO carts (id, user_id, session_id, status, created_at, updated_at)
-SELECT 1001, u.id, 'seed-session-001', 'COMPLETED', '2026-05-10 08:32:00', '2026-05-10 09:15:00'
-FROM users u WHERE u.email = 'ana.torres@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM carts c WHERE c.id = 1001);
+INSERT INTO performance_logs (id, page, load_time_ms, created_at) VALUES
+(1, 'catalogo', 820, '2026-05-10 08:31:00'),
+(2, 'catalogo', 970, '2026-05-10 09:00:00'),
+(3, 'catalogo', 1160, '2026-05-10 11:10:00'),
+(4, 'catalogo', 890, '2026-05-10 13:25:00');
 
-INSERT INTO carts (id, user_id, session_id, status, created_at, updated_at)
-SELECT 1002, u.id, 'seed-session-002', 'COMPLETED', '2026-05-10 09:05:00', '2026-05-10 10:40:00'
-FROM users u WHERE u.email = 'carlos.ramirez@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM carts c WHERE c.id = 1002);
+INSERT INTO stock_alerts (id, product_id, alert_type, stock_at_alert, status, created_at, attended_at) VALUES
+(1, 12, 'LOW_STOCK', 4, 'PENDING', '2026-05-10 08:00:00', NULL),
+(2, 11, 'LOW_STOCK', 3, 'ATTENDED', '2026-05-10 09:00:00', '2026-05-10 15:00:00'),
+(3, 14, 'LOW_STOCK', 0, 'PENDING', '2026-05-10 09:30:00', NULL);
 
-INSERT INTO carts (id, user_id, session_id, status, created_at, updated_at)
-SELECT 1003, u.id, 'seed-session-003', 'COMPLETED', '2026-05-10 10:25:00', '2026-05-10 12:05:00'
-FROM users u WHERE u.email = 'valeria.soto@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM carts c WHERE c.id = 1003);
-
-INSERT INTO carts (id, user_id, session_id, status, created_at, updated_at)
-SELECT 1004, u.id, 'seed-session-004', 'COMPLETED', '2026-05-10 11:12:00', '2026-05-10 15:30:00'
-FROM users u WHERE u.email = 'diego.chavez@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM carts c WHERE c.id = 1004);
-
-INSERT INTO carts (id, user_id, session_id, status, created_at, updated_at)
-SELECT 1005, u.id, 'seed-session-005', 'ACTIVE', '2026-05-10 16:30:00', '2026-05-10 17:20:00'
-FROM users u WHERE u.email = 'mariana.vega@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM carts c WHERE c.id = 1005);
-
-INSERT INTO carts (id, user_id, session_id, status, created_at, updated_at)
-SELECT 1006, NULL, 'seed-session-006', 'ABANDONED', '2026-05-10 13:25:00', '2026-05-10 13:48:00'
-WHERE NOT EXISTS (SELECT 1 FROM carts c WHERE c.id = 1006);
-
-INSERT INTO performance_logs (id, page, load_time_ms, created_at)
-SELECT 1001, 'catalogo', 820, '2026-05-10 08:31:00'
-WHERE NOT EXISTS (SELECT 1 FROM performance_logs pl WHERE pl.id = 1001);
-
-INSERT INTO performance_logs (id, page, load_time_ms, created_at)
-SELECT 1002, 'catalogo', 970, '2026-05-10 09:00:00'
-WHERE NOT EXISTS (SELECT 1 FROM performance_logs pl WHERE pl.id = 1002);
-
-INSERT INTO performance_logs (id, page, load_time_ms, created_at)
-SELECT 1003, 'catalogo', 1160, '2026-05-10 11:10:00'
-WHERE NOT EXISTS (SELECT 1 FROM performance_logs pl WHERE pl.id = 1003);
-
-INSERT INTO performance_logs (id, page, load_time_ms, created_at)
-SELECT 1004, 'catalogo', 890, '2026-05-10 13:25:00'
-WHERE NOT EXISTS (SELECT 1 FROM performance_logs pl WHERE pl.id = 1004);
-
-INSERT INTO stock_alerts (id, product_id, alert_type, stock_at_alert, status, created_at, attended_at)
-SELECT 1001, p.id, 'LOW_STOCK', 4, 'PENDING', '2026-05-10 08:00:00', NULL
-FROM products p WHERE p.name = 'Canon EOS R6'
-AND NOT EXISTS (SELECT 1 FROM stock_alerts sa WHERE sa.id = 1001);
-
-INSERT INTO stock_alerts (id, product_id, alert_type, stock_at_alert, status, created_at, attended_at)
-SELECT 1002, p.id, 'LOW_STOCK', 3, 'ATTENDED', '2026-05-10 09:00:00', '2026-05-10 15:00:00'
-FROM products p WHERE p.name = 'LG OLED 65'
-AND NOT EXISTS (SELECT 1 FROM stock_alerts sa WHERE sa.id = 1002);
+INSERT INTO audit_logs (id, user_id, action, entity, entity_id, description, created_at) VALUES
+(1, 1, 'PRODUCT_CREATED', 'Product', 1, 'Carga inicial de productos', '2026-05-10 08:00:00'),
+(2, 1, 'REPORT_EXPORTED', 'Report', NULL, 'Reporte inicial de ventas', '2026-05-10 18:00:00');

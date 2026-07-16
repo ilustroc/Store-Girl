@@ -12,6 +12,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByCategoryIdAndActiveTrueOrderByIdDesc(Long categoryId);
 
+    long countByCategoryIdAndActiveTrue(Long categoryId);
+
+    boolean existsByNameIgnoreCase(String name);
+
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
+
     long countByActiveTrue();
 
     long countByActiveTrueAndStockLessThanEqual(Integer stock);

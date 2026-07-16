@@ -29,6 +29,10 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .report-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .catalog-sidebar,
     .cart-total-card {
         position: static;
@@ -119,6 +123,17 @@
 
     .admin-stat-grid {
         grid-template-columns: 1fr;
+    }
+
+    .report-filter-grid,
+    .report-filter-actions {
+        grid-template-columns: 1fr;
+        grid-column: auto;
+    }
+
+    .report-filter-actions {
+        align-items: stretch;
+        flex-direction: column;
     }
 
     .chart-box {

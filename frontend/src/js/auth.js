@@ -1,8 +1,10 @@
 const Auth = (() => {
     const sessionKey = "tecnostore.session";
+    const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    const PHONE_REGEX = /^9\d{8}$/;
     const demoUsers = {
-        admin: { email: "admin@gmail.com", password: "admin" },
-        user: { email: "usuario@gmail.com", password: "usuario" }
+        admin: { email: "admin@gmail.com", password: "Admin@123" },
+        user: { email: "usuario@gmail.com", password: "Usuario@123" }
     };
 
     function init() {
@@ -31,7 +33,9 @@ const Auth = (() => {
             id: user.id,
             fullName: user.fullName,
             email: user.email,
-            role: user.role
+            role: user.role,
+            phone: user.phone,
+            token: user.token
         };
         localStorage.setItem(sessionKey, JSON.stringify(safeUser));
         refreshUi();
@@ -71,7 +75,10 @@ const Auth = (() => {
         const errors = {};
         if (!data.fullName) errors.fullName = "Ingresa tu nombre completo.";
         if (!isValidEmail(data.email)) errors.email = "Ingresa un correo electrónico válido.";
-        if (!data.password) errors.password = "Ingresa una contraseña.";
+        if (!PHONE_REGEX.test(data.phone || "")) errors.phone = "El teléfono debe contener 9 dígitos y comenzar con 9.";
+        if (!PASSWORD_REGEX.test(data.password || "")) {
+            errors.password = "La contraseña debe contener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.";
+        }
         return showValidationErrors(form, errors);
     }
 
@@ -89,7 +96,7 @@ const Auth = (() => {
             const input = form.elements[name];
             if (!input) return;
             input.classList.add("is-invalid");
-            const feedback = input.parentElement.querySelector(".invalid-feedback");
+            const feedback = input.closest(".mb-3")?.querySelector(".invalid-feedback") || input.parentElement.querySelector(".invalid-feedback");
             if (feedback) feedback.textContent = message;
         });
 
@@ -132,6 +139,24 @@ const Auth = (() => {
         });
     }
 
+    function bindPasswordToggle(scope) {
+        scope.querySelectorAll("[data-password-toggle]").forEach(button => {
+            const input = document.getElementById(button.dataset.passwordToggle);
+            if (!input) return;
+
+            button.addEventListener("click", () => {
+                const showPassword = input.type === "password";
+                input.type = showPassword ? "text" : "password";
+                const label = showPassword ? "Ocultar contraseña" : "Mostrar contraseña";
+                button.setAttribute("aria-label", label);
+                button.setAttribute("title", label);
+                button.querySelector('[data-password-icon="show"]')?.classList.toggle("d-none", showPassword);
+                button.querySelector('[data-password-icon="hide"]')?.classList.toggle("d-none", !showPassword);
+                input.focus();
+            });
+        });
+    }
+
     async function initLoginPage() {
         const form = document.getElementById("login-page-form");
         if (!form) return;
@@ -160,6 +185,7 @@ const Auth = (() => {
     async function initRegisterPage() {
         const form = document.getElementById("register-page-form");
         if (!form) return;
+        bindPasswordToggle(form);
         form.addEventListener("submit", async event => {
             event.preventDefault();
             const data = getAuthFormData(form);

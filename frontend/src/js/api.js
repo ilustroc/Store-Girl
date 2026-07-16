@@ -9,14 +9,17 @@ const Api = (() => {
         }
     }
 
-    async function request(path, options = {}) {
+    function authHeaders(json = true) {
         const session = currentSession();
-        const headers = { "Content-Type": "application/json" };
-        if (session?.role) headers["X-User-Role"] = session.role;
+        const headers = json ? { "Content-Type": "application/json" } : {};
+        if (session?.token) headers.Authorization = `Bearer ${session.token}`;
+        return headers;
+    }
 
+    async function request(path, options = {}) {
         const response = await fetch(`${API_BASE_URL}${path}`, {
             method: options.method || "GET",
-            headers,
+            headers: authHeaders(true),
             body: options.body ? JSON.stringify(options.body) : undefined
         });
 
@@ -28,16 +31,12 @@ const Api = (() => {
     }
 
     async function upload(path, file) {
-        const session = currentSession();
-        const headers = {};
-        if (session?.role) headers["X-User-Role"] = session.role;
-
         const formData = new FormData();
         formData.append("file", file);
 
         const response = await fetch(`${API_BASE_URL}${path}`, {
             method: "POST",
-            headers,
+            headers: authHeaders(false),
             body: formData
         });
 
@@ -46,6 +45,28 @@ const Api = (() => {
             throw new Error(data?.message || data?.error || "No se pudo completar la solicitud");
         }
         return data;
+    }
+
+    async function download(path, filename) {
+        const response = await fetch(`${API_BASE_URL}${path}`, {
+            method: "GET",
+            headers: authHeaders(false)
+        });
+        if (!response.ok) {
+            const data = await parseResponse(response);
+            throw new Error(data?.message || data?.error || "No se pudo descargar el archivo");
+        }
+        const blob = await response.blob();
+        const disposition = response.headers.get("Content-Disposition") || "";
+        const serverName = disposition.match(/filename="?([^"]+)"?/i)?.[1];
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = serverName || filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(objectUrl);
     }
 
     async function parseResponse(response) {
@@ -58,10 +79,18 @@ const Api = (() => {
         }
     }
 
+    function query(params = {}) {
+        const clean = Object.entries(params).filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "");
+        return clean.length ? `?${new URLSearchParams(clean).toString()}` : "";
+    }
+
     return {
         getCategories: () => request("/categories"),
+        getAdminCategories: () => request("/categories?includeInactive=true"),
         createCategory: category => request("/categories", { method: "POST", body: category }),
         updateCategory: (id, category) => request(`/categories/${id}`, { method: "PUT", body: category }),
+        updateCategoryStatus: (id, active) => request(`/categories/${id}/status`, { method: "PUT", body: { active } }),
+        deleteCategory: id => request(`/categories/${id}`, { method: "DELETE" }),
         getAdminDashboard: () => request("/admin/dashboard"),
         getAdminIndicators: () => request("/admin/indicators"),
         getProducts: () => request("/products"),
@@ -80,6 +109,8 @@ const Api = (() => {
         getOrders: () => request("/orders"),
         getOrdersByUser: userId => request(`/orders/user/${userId}`),
         getUserOrders: userId => request(`/orders/user/${userId}`),
+        getReport: (type, filters) => request(`/reports/${type}${query(filters)}`),
+        exportReport: (type, format, filters) => download(`/reports/${type}/${format}${query(filters)}`, `reporte_${type}.${format}`),
         trackVisit: event => request("/analytics/visit", { method: "POST", body: event }),
         trackPerformance: event => request("/analytics/performance", { method: "POST", body: event }),
         trackCart: event => request("/analytics/cart", { method: "POST", body: event })

@@ -59,3 +59,8 @@ Diagramas relacionados:
 - `POST /api/orders`
 - `GET /api/orders`
 - `GET /api/orders/user/{userId}`
+## Actualización de seguridad y reportes
+
+La versión final incorpora Spring Security con JWT, BCrypt para contraseñas, autorización por roles en backend y perfiles `dev`/`prod`.
+
+También se agrega el módulo administrativo de reportes con filtros, tabla previa y exportación real a XLSX/PDF mediante Apache POI y OpenPDF. Los diagramas relacionados están en `documentacion/plantuml/`.

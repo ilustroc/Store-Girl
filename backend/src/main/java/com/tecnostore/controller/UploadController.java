@@ -1,8 +1,11 @@
 package com.tecnostore.controller;
 
-import com.tecnostore.model.Role;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,11 +29,8 @@ public class UploadController {
     }
 
     @PostMapping("/product-image")
-    public Map<String, String> uploadProductImage(
-            @RequestHeader(value = "X-User-Role", required = false) String role,
-            @RequestParam("file") MultipartFile file
-    ) throws IOException {
-        requireAdmin(role);
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<String, String> uploadProductImage(@RequestParam("file") MultipartFile file) throws IOException {
         validateImage(file);
 
         Path uploadDirectory = resolveUploadDirectory();
@@ -45,7 +45,7 @@ public class UploadController {
 
     private void validateImage(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("Selecciona una imagen válida");
+            throw new IllegalArgumentException("Selecciona una imagen valida");
         }
         if (file.getSize() > MAX_IMAGE_SIZE) {
             throw new IllegalArgumentException("La imagen no debe superar 5MB");
@@ -105,11 +105,5 @@ public class UploadController {
         }
         int dot = filename.lastIndexOf('.');
         return dot >= 0 ? filename.substring(dot + 1).toLowerCase(Locale.ROOT) : "";
-    }
-
-    private void requireAdmin(String role) {
-        if (!Role.ADMIN.name().equalsIgnoreCase(role)) {
-            throw new SecurityException("Solo el administrador puede subir imágenes");
-        }
     }
 }

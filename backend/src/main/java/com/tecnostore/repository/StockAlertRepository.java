@@ -9,4 +9,6 @@ public interface StockAlertRepository extends JpaRepository<StockAlert, Long> {
     long countByStatusIgnoreCase(String status);
 
     List<StockAlert> findTop5ByOrderByCreatedAtDesc();
+
+    boolean existsByProductIdAndAlertTypeIgnoreCaseAndStatusIgnoreCase(Long productId, String alertType, String status);
 }

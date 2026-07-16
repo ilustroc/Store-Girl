@@ -1,7 +1,5 @@
-CREATE DATABASE IF NOT EXISTS tecnostore_db
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
+DROP DATABASE IF EXISTS tecnostore_db;
+CREATE DATABASE tecnostore_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE tecnostore_db;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -18,7 +16,9 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS categories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(80) NOT NULL UNIQUE,
-    description VARCHAR(250)
+    description VARCHAR(250),
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS products (
@@ -89,4 +89,15 @@ CREATE TABLE IF NOT EXISTS stock_alerts (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     attended_at TIMESTAMP NULL,
     CONSTRAINT fk_stock_alerts_products FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT,
+    action VARCHAR(80) NOT NULL,
+    entity VARCHAR(80) NOT NULL,
+    entity_id BIGINT,
+    description VARCHAR(500),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_audit_logs_users FOREIGN KEY (user_id) REFERENCES users(id)
 );

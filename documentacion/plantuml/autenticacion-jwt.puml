@@ -1,0 +1,19 @@
+@startuml
+title Autenticación JWT
+actor Usuario
+participant Frontend
+participant AuthController
+participant AuthService
+participant UserRepository
+database MySQL
+
+Usuario -> Frontend : Ingresa credenciales
+Frontend -> AuthController : POST /auth/login
+AuthController -> AuthService : login(request)
+AuthService -> UserRepository : buscar email activo
+UserRepository -> MySQL : users
+AuthService -> AuthService : BCrypt.matches()
+AuthService --> AuthController : LoginResponse + JWT
+AuthController --> Frontend : token y usuario mínimo
+Frontend -> Frontend : Guarda sesión local
+@enduml

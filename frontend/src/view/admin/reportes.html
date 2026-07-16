@@ -1,0 +1,130 @@
+<section class="page-hero compact admin-hero">
+    <div class="container">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-end">
+            <div>
+                <p class="eyebrow">Administrador</p>
+                <h1>Reportes</h1>
+                <p>Consulta ventas, inventario, rentabilidad, categorías y alertas con información real de la tienda.</p>
+            </div>
+            <div class="admin-toolbar">
+                <button class="btn btn-outline-light" id="btn-report-pdf">
+                    <i class="bi bi-filetype-pdf me-2"></i>Exportar PDF
+                </button>
+                <button class="btn btn-warning" id="btn-report-xlsx">
+                    <i class="bi bi-file-earmark-spreadsheet me-2"></i>Exportar XLSX
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad bg-white">
+    <div class="container">
+        <div class="surface-card mb-4">
+            <form id="reports-filter-form" class="report-filter-grid">
+                <div>
+                    <label class="form-label" for="report-type">Tipo de reporte</label>
+                    <select class="form-select" id="report-type" name="type">
+                        <option value="sales">Reporte de ventas</option>
+                        <option value="orders">Reporte de pedidos</option>
+                        <option value="inventory">Reporte de inventario</option>
+                        <option value="products">Reporte de productos</option>
+                        <option value="profitability">Reporte de rentabilidad</option>
+                        <option value="low-stock">Reporte de stock bajo</option>
+                        <option value="categories">Reporte de categorías</option>
+                        <option value="stock-alerts">Reporte de alertas de stock</option>
+                        <option value="audit">Registro de auditoría</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="report-date-from">Fecha inicial</label>
+                    <input class="form-control" id="report-date-from" name="dateFrom" type="date">
+                </div>
+                <div>
+                    <label class="form-label" for="report-date-to">Fecha final</label>
+                    <input class="form-control" id="report-date-to" name="dateTo" type="date">
+                </div>
+                <div>
+                    <label class="form-label" for="report-status">Estado pedido</label>
+                    <select class="form-select" id="report-status" name="status">
+                        <option value="">Todos</option>
+                        <option value="CONFIRMED">Confirmado</option>
+                        <option value="PENDING">Pendiente</option>
+                        <option value="CANCELLED">Cancelado</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="report-category">Categoría</label>
+                    <select class="form-select" id="report-category" name="categoryId">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="report-product-name">Producto</label>
+                    <input class="form-control" id="report-product-name" name="productName" type="search" placeholder="Nombre de producto">
+                </div>
+                <div>
+                    <label class="form-label" for="report-client">Cliente</label>
+                    <input class="form-control" id="report-client" name="client" type="search" placeholder="Nombre del cliente">
+                </div>
+                <div>
+                    <label class="form-label" for="report-active">Estado producto/categoría</label>
+                    <select class="form-select" id="report-active" name="active">
+                        <option value="">Todos</option>
+                        <option value="true">Activos</option>
+                        <option value="false">Inactivos</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="report-stock-min">Stock mínimo</label>
+                    <input class="form-control" id="report-stock-min" name="stockMin" type="number" min="0">
+                </div>
+                <div>
+                    <label class="form-label" for="report-stock-max">Stock máximo</label>
+                    <input class="form-control" id="report-stock-max" name="stockMax" type="number" min="0">
+                </div>
+                <div>
+                    <label class="form-label" for="report-price-min">Precio mínimo</label>
+                    <input class="form-control" id="report-price-min" name="priceMin" type="number" min="0" step="0.01">
+                </div>
+                <div>
+                    <label class="form-label" for="report-price-max">Precio máximo</label>
+                    <input class="form-control" id="report-price-max" name="priceMax" type="number" min="0" step="0.01">
+                </div>
+                <div class="report-filter-actions">
+                    <button class="btn btn-primary" type="submit" id="btn-report-search">
+                        <i class="bi bi-search me-2"></i>Buscar
+                    </button>
+                    <button class="btn btn-outline-secondary" type="button" id="btn-report-clear">
+                        <i class="bi bi-x-circle me-2"></i>Limpiar filtros
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="surface-card">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-3">
+                <div>
+                    <p class="eyebrow mb-1">Resultados</p>
+                    <h2 id="report-title">Reporte</h2>
+                    <span class="text-muted" id="report-total">0 registros</span>
+                </div>
+                <div class="report-summary" id="report-summary"></div>
+            </div>
+            <div class="alert d-none" id="report-alert" role="alert"></div>
+            <div class="table-responsive">
+                <table class="table align-middle report-table">
+                    <thead id="report-table-head"></thead>
+                    <tbody id="report-table-body"></tbody>
+                </table>
+            </div>
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-md-center mt-3">
+                <span class="text-muted small" id="report-page-label">Página 1</span>
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary btn-sm" id="report-prev-page">Anterior</button>
+                    <button class="btn btn-outline-secondary btn-sm" id="report-next-page">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

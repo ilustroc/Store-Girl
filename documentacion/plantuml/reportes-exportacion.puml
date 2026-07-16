@@ -1,0 +1,21 @@
+@startuml
+title Reportes y Exportación
+actor Administrador
+participant "Frontend Reportes" as UI
+participant ReportController
+participant ReportService
+participant Repositories
+database MySQL
+
+Administrador -> UI : Aplica filtros
+UI -> ReportController : GET /reports/{type}
+ReportController -> ReportService : build(type, filters)
+ReportService -> Repositories : Consultas reales
+Repositories -> MySQL : orders/products/categories
+ReportService --> UI : Tabla y resumen
+
+Administrador -> UI : Exportar XLSX/PDF
+UI -> ReportController : GET /reports/{type}/xlsx o pdf
+ReportController -> ReportService : exportar
+ReportService --> UI : Archivo descargable
+@enduml

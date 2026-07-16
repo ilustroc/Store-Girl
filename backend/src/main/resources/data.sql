@@ -1,11 +1,11 @@
 INSERT IGNORE INTO users (full_name, email, password, role, phone, active) VALUES
-('Administrador', 'admin@gmail.com', 'admin', 'ADMIN', '+51 999 888 777', TRUE),
-('Usuario Demo', 'usuario@gmail.com', 'usuario', 'USER', '+51 988 777 666', TRUE),
-('Ana Torres', 'ana.torres@gmail.com', 'usuario', 'USER', '+51 955 120 441', TRUE),
-('Carlos Ramirez', 'carlos.ramirez@gmail.com', 'usuario', 'USER', '+51 944 331 902', TRUE),
-('Valeria Soto', 'valeria.soto@gmail.com', 'usuario', 'USER', '+51 933 770 118', TRUE),
-('Diego Chavez', 'diego.chavez@gmail.com', 'usuario', 'USER', '+51 922 604 833', TRUE),
-('Mariana Vega', 'mariana.vega@gmail.com', 'usuario', 'USER', '+51 911 805 274', TRUE);
+('Administrador', 'admin@gmail.com', '$2a$10$zJko6lmGEe6FB0G1YjG9delsZ5Vjx6NpjuzxlNN7S3YEQPQvXY22W', 'ADMIN', '999888777', TRUE),
+('Usuario Demo', 'usuario@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '988777666', TRUE),
+('Ana Torres', 'ana.torres@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '955120441', TRUE),
+('Carlos Ramirez', 'carlos.ramirez@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '944331902', TRUE),
+('Valeria Soto', 'valeria.soto@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '933770118', TRUE),
+('Diego Chavez', 'diego.chavez@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '922604833', TRUE),
+('Mariana Vega', 'mariana.vega@gmail.com', '$2a$10$.3H87kyQCztVQcvLhwb8luKlws5Rvb0rZ8.gS9TMj9jVOVpZmnNFi', 'USER', '911805274', TRUE);
 
 INSERT IGNORE INTO categories (name, description) VALUES
 ('Smartphones', 'Telefonos inteligentes de gama media y alta'),

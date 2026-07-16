@@ -1,40 +1,22 @@
 # Backend Spring Boot - TecnoStore
 
-API REST para la tienda tecnologica universitaria.
+API REST con Java 17, Spring Boot 3.3.5, Spring Data JPA, MySQL, Spring Security, JWT, BCrypt, Apache POI y OpenPDF.
 
-## Tecnologias
+## Configuración
 
-- Java 17
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- MySQL
-- Maven
+El backend usa `server.servlet.context-path=/api`, por eso los controllers declaran rutas internas como `/products`, `/auth`, `/orders`, `/admin` y `/reports`.
 
-## MySQL
+Variables recomendadas:
 
-Crear la base y cargar datos iniciales:
-
-```powershell
-mysql -u root -p < ..\base-de-datos\schema.sql
-mysql -u root -p tecnostore_db < ..\base-de-datos\seed.sql
+```text
+DB_URL
+DB_USERNAME
+DB_PASSWORD
+JWT_SECRET
+CORS_ALLOWED_ORIGINS
 ```
 
-El seed agrega compradores y pedidos de muestra para poblar el panel de control administrativo.
-
-Configuracion usada por `application.properties`:
-
-```properties
-server.port=8080
-server.servlet.context-path=/api
-spring.datasource.url=jdbc:mysql://localhost:3306/tecnostore_db?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
-spring.datasource.username=root
-spring.datasource.password=root
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-spring.sql.init.mode=never
-```
-
-`schema.sql` y `data.sql` quedan como referencia idempotente, pero no se ejecutan automaticamente para evitar borrar o duplicar datos.
+Para desarrollo local se mantienen valores por defecto en `application.properties`.
 
 ## Ejecutar
 
@@ -43,59 +25,31 @@ cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
-La API queda en:
+## Seguridad
+
+- Login: `POST /api/auth/login`.
+- Registro: `POST /api/auth/register`.
+- Respuesta de login: `id`, `fullName`, `email`, `role`, `phone`, `token`.
+- Enviar token: `Authorization: Bearer <jwt>`.
+- ADMIN protege productos, categorías, indicadores, reportes, pedidos generales e imágenes.
+- USER puede comprar y consultar sus propios pedidos.
+
+Credenciales de prueba:
 
 ```text
-http://localhost:8080/api
+admin@gmail.com / Admin@123
+usuario@gmail.com / Usuario@123
 ```
 
-Si ya tienes Maven instalado globalmente, tambien puedes usar `mvn spring-boot:run`.
-
-## Credenciales
+## Reportes
 
 ```text
-Administrador: admin@gmail.com / admin
-Usuario:       usuario@gmail.com / usuario
+GET /api/reports/sales
+GET /api/reports/inventory
+GET /api/reports/products
+GET /api/reports/profitability
+GET /api/reports/{type}/xlsx
+GET /api/reports/{type}/pdf
 ```
 
-## Endpoints
-
-```text
-POST   /api/auth/login
-POST   /api/auth/register
-GET    /api/categories
-POST   /api/categories
-PUT    /api/categories/{id}
-GET    /api/admin/dashboard
-GET    /api/admin/indicators
-GET    /api/products
-GET    /api/products/{id}
-GET    /api/products/category/{categoryId}
-POST   /api/products
-PUT    /api/products/{id}
-DELETE /api/products/{id}
-POST   /api/uploads/product-image
-POST   /api/analytics/visit
-POST   /api/analytics/performance
-POST   /api/analytics/cart
-POST   /api/orders
-GET    /api/orders
-GET    /api/orders/user/{userId}
-```
-
-Para crear, editar o eliminar productos, crear o editar categorias, subir imagenes y ver todos los pedidos, enviar el header:
-
-```text
-X-User-Role: ADMIN
-```
-
-## Carga de imagenes
-
-```text
-POST /api/uploads/product-image
-Content-Type: multipart/form-data
-Campo: file
-Respuesta: { "path": "assets/img/nombre-imagen.png" }
-```
-
-El archivo se guarda en `frontend/assets/img/`. Si el nombre ya existe, se renombra automaticamente.
+Las exportaciones generan archivos reales XLSX y PDF con filtros, encabezados, datos y resumen.

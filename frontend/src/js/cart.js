@@ -172,6 +172,10 @@ const Cart = (() => {
         try {
             await Api.createOrder({
                 userId: Auth.session().id,
+                fullName: data.fullName,
+                phone: data.phone,
+                address: data.address,
+                comment: data.comment,
                 items: items.map(item => ({ productId: item.productId, quantity: item.quantity }))
             });
             clear("COMPLETED");
@@ -198,12 +202,12 @@ const Cart = (() => {
     function validateCheckout(data) {
         const errors = {
             "checkout-name": !data.fullName,
-            "checkout-phone": !data.phone,
+            "checkout-phone": !/^9\d{8}$/.test(data.phone || ""),
             "checkout-address": !data.address
         };
         Object.entries(errors).forEach(([id, invalid]) => document.getElementById(id)?.classList.toggle("is-invalid", invalid));
         const hasErrors = Object.values(errors).some(Boolean);
-        StoreUtils.showAlert("#checkout-alert", hasErrors ? "Completa nombre, teléfono y dirección para confirmar tu pedido." : "", "warning");
+        StoreUtils.showAlert("#checkout-alert", hasErrors ? "Completa nombre, teléfono peruano válido y dirección para confirmar tu pedido." : "", "warning");
         return !hasErrors;
     }
 

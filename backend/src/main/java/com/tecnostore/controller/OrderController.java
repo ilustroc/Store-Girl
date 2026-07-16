@@ -2,9 +2,10 @@ package com.tecnostore.controller;
 
 import com.tecnostore.dto.OrderRequest;
 import com.tecnostore.model.Order;
-import com.tecnostore.model.Role;
 import com.tecnostore.service.OrderService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,20 +20,23 @@ public class OrderController {
     }
 
     @PostMapping
-    public Order create(@Valid @RequestBody OrderRequest request) {
-        return orderService.create(request);
+    public Order create(@Valid @RequestBody OrderRequest request, Authentication authentication) {
+        return orderService.create(request, authentication.getName(), isAdmin(authentication));
     }
 
     @GetMapping
-    public List<Order> findAll(@RequestHeader(value = "X-User-Role", required = false) String role) {
-        if (!Role.ADMIN.name().equalsIgnoreCase(role)) {
-            throw new SecurityException("Solo el administrador puede ver todos los pedidos");
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Order> findAll() {
         return orderService.findAll();
     }
 
     @GetMapping("/user/{userId}")
-    public List<Order> findByUser(@PathVariable Long userId) {
-        return orderService.findByUser(userId);
+    public List<Order> findByUser(@PathVariable Long userId, Authentication authentication) {
+        return orderService.findByUser(userId, authentication.getName(), isAdmin(authentication));
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 }

@@ -23,7 +23,7 @@ folder "frontend/assets/img\nImagenes de productos" as Assets
 Usuario --> Frontend : compra productos
 Administrador --> AdminUI : gestiona catalogo
 Frontend --> Controllers : HTTP / JSON
-AdminUI --> Controllers : HTTP / JSON + X-User-Role
+AdminUI --> Controllers : HTTP / JSON + JWT
 Controllers --> Services
 Services --> Repositories
 Repositories --> MySQL

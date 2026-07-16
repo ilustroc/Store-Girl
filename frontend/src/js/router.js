@@ -10,7 +10,8 @@ const Router = (() => {
         { pattern: /^\/registro$/, view: "src/view/auth/registro.html", handler: Auth.mountRegistro },
         { pattern: /^\/mis-pedidos$/, view: "src/view/user/mis-pedidos.html", handler: mountOrders },
         { pattern: /^\/admin$/, view: "src/view/admin/dashboard.html", handler: guardedAdmin(Admin.mountDashboard) },
-        { pattern: /^\/admin\/productos$/, view: "src/view/admin/productos.html", handler: guardedAdmin(Admin.mountProducts) }
+        { pattern: /^\/admin\/productos$/, view: "src/view/admin/productos.html", handler: guardedAdmin(Admin.mountProducts) },
+        { pattern: /^\/admin\/reportes$/, view: "src/view/admin/reportes.html", handler: guardedAdmin(Admin.mountReports) }
     ];
 
     function init() {

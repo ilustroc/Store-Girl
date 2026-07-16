@@ -1,0 +1,17 @@
+@startuml
+title CRUD de Productos
+actor Administrador
+participant "Frontend Admin" as UI
+participant ProductController
+participant ProductService
+participant ProductRepository
+database MySQL
+
+Administrador -> UI : Crear/editar/desactivar producto
+UI -> ProductController : Request con JWT ADMIN
+ProductController -> ProductService : Validar DTO
+ProductService -> ProductRepository : Guardar o actualizar
+ProductRepository -> MySQL : products
+ProductService --> ProductController : Producto actualizado
+ProductController --> UI : Confirmación
+@enduml
